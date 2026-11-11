@@ -22,23 +22,34 @@ import "./brand.js";
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
 import { StringManager } from "./i18n/StringManager.js";
-import { SimPreferencesModel } from "./preferences/SimPreferencesModel.js";
-import { SimPreferencesNode } from "./preferences/SimPreferencesNode.js";
-import SimColors from "./SimColors.js";
-import { SimScreen } from "./sim-screen/SimScreen.js";
+import { MRIScreen } from "./mri/MRIScreen.js";
+import { NMRScreen } from "./nmr/NMRScreen.js";
+import { SimplifiedMRIPreferencesModel } from "./preferences/SimplifiedMRIPreferencesModel.js";
+import { SimplifiedMRIPreferencesNode } from "./preferences/SimplifiedMRIPreferencesNode.js";
+import { RelaxationScreen } from "./relaxation/RelaxationScreen.js";
+import SimplifiedMRIColors from "./SimplifiedMRIColors.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
 
-  // Simulation-specific preferences; initial values come from simQueryParameters.
-  const simPreferences = new SimPreferencesModel(Tandem.ROOT.createTandem("preferences"));
+  // Simulation-specific preferences; initial values come from simplifiedMRIQueryParameters.
+  const simPreferences = new SimplifiedMRIPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new SimScreen({
-      // The screen name Property updates automatically when the locale changes
-      name: stringManager.getScreenNames().simStringProperty,
-      tandem: Tandem.ROOT.createTandem("simScreen"),
-      backgroundColorProperty: SimColors.backgroundColorProperty,
+    new NMRScreen(simPreferences.snapToResonanceProperty, {
+      name: stringManager.getScreenNames().nmrStringProperty,
+      tandem: Tandem.ROOT.createTandem("nmrScreen"),
+      backgroundColorProperty: SimplifiedMRIColors.backgroundColorProperty,
+    }),
+    new MRIScreen(simPreferences.snapToResonanceProperty, {
+      name: stringManager.getScreenNames().mriStringProperty,
+      tandem: Tandem.ROOT.createTandem("mriScreen"),
+      backgroundColorProperty: SimplifiedMRIColors.backgroundColorProperty,
+    }),
+    new RelaxationScreen({
+      name: stringManager.getScreenNames().relaxationStringProperty,
+      tandem: Tandem.ROOT.createTandem("relaxationScreen"),
+      backgroundColorProperty: SimplifiedMRIColors.backgroundColorProperty,
     }),
   ];
 
@@ -53,7 +64,7 @@ onReadyToLaunch(() => {
       simulationOptions: {
         customPreferences: [
           {
-            createContent: (tandem: Tandem) => new SimPreferencesNode(simPreferences, tandem),
+            createContent: (tandem: Tandem) => new SimplifiedMRIPreferencesNode(simPreferences, tandem),
           },
         ],
       },
@@ -64,10 +75,11 @@ onReadyToLaunch(() => {
     }),
 
     // Optional: fill in credits shown in Help → About
+    // Credits shown in Help → About. The original Java sim is PhET's "Simplified MRI".
     credits: {
-      leadDesign: "",
-      softwareDevelopment: "",
-      team: "",
+      leadDesign: "Michael Dubson, Sam McKagan, Kathy Perkins, Carl Wieman (PhET original)",
+      softwareDevelopment: "Ron LeMaster (PhET Java original); OpenLyceum SceneryStack port",
+      team: "Danielle Harlow (PhET interviews)",
       qualityAssurance: "",
     },
   });

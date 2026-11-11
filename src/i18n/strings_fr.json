@@ -1,21 +1,160 @@
 {
-  "title": "Modèle de Simulation",
+  "title": "IRM simplifiée",
   "screens": {
-    "sim": "Simulation"
+    "nmr": "RMN",
+    "mri": "IRM",
+    "relaxation": "Relaxation"
+  },
+  "common": {
+    "mainMagnet": "Aimant principal",
+    "field": "Champ",
+    "teslaPattern": "{{value}} T",
+    "radioSource": "Source d’ondes radio",
+    "power": "Puissance",
+    "percentPattern": "{{value}} %",
+    "frequency": "Fréquence",
+    "megahertzPattern": "{{value}} MHz",
+    "waveView": "Vue ondulatoire",
+    "photonView": "Vue photonique",
+    "show": "Afficher",
+    "fieldArrows": "Champ magnétique",
+    "precession": "Précession (ralentie)",
+    "hint": "Réglez la puissance et la fréquence",
+    "sampleNucleus": "Noyau de l’échantillon",
+    "energyLevels": "Niveaux d’énergie",
+    "energy": "Énergie",
+    "onResonance": "En résonance",
+    "nuclei": {
+      "hydrogen1": "hydrogène 1",
+      "nitrogen14": "azote 14",
+      "sodium23": "sodium 23",
+      "carbon13": "carbone 13",
+      "oxygen17": "oxygène 17",
+      "sulfur33": "soufre 33",
+      "unknown": "inconnu"
+    }
+  },
+  "mri": {
+    "gradientMagnets": "Bobines de gradient",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "head": "Tête",
+    "showHead": "Tête",
+    "showNuclei": "Noyaux atomiques",
+    "addTumor": "Ajouter une tumeur",
+    "removeTumor": "Retirer la tumeur",
+    "detector": "Détecteur",
+    "detectorRatePattern": "{{count}} photons/s"
+  },
+  "relaxation": {
+    "tissue": "Tissu",
+    "tissues": {
+      "fat": "Graisse",
+      "whiteMatter": "Substance blanche",
+      "grayMatter": "Substance grise",
+      "muscle": "Muscle",
+      "blood": "Sang",
+      "csf": "Liquide cérébrospinal",
+      "custom": "Personnalisé"
+    },
+    "t1": "T₁",
+    "t2": "T₂",
+    "millisecondsPattern": "{{value}} ms",
+    "rfPulse": "Impulsion RF",
+    "flipAngle": "Angle de bascule",
+    "degreesPattern": "{{value}}°",
+    "applyPulse": "Appliquer l’impulsion",
+    "equilibrium": "Retour à l’équilibre",
+    "rotatingFrame": "Référentiel tournant",
+    "isochromats": "Spins individuels",
+    "signal": "Signal",
+    "longitudinalTitle": "Aimantation longitudinale",
+    "transverseTitle": "Aimantation transversale",
+    "timeAxis": "Temps depuis l’impulsion (ms)",
+    "mzAxis": "M<sub>z</sub> / M<sub>0</sub>",
+    "mxyAxis": "|M<sub>xy</sub>| / M<sub>0</sub>",
+    "signalNote": "Oscillation du signal ralentie pour l’affichage",
+    "larmorPattern": "B₀ = {{field}} T,  f = {{frequency}} MHz",
+    "precessionNote": "Précession ralentie d’environ 10⁸ fois",
+    "readoutPattern": "M<sub>z</sub> = {{mz}}   |M<sub>xy</sub>| = {{mxy}}",
+    "pulseHint": "Appliquez une impulsion pour basculer l’aimantation"
   },
   "a11y": {
-    "screenSummary": {
-      "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-      "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-      "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+    "common": {
+      "mainField": "Champ magnétique principal",
+      "mainFieldHelp": "Champ de l’aimant principal en tesla. L’écart d’énergie entre les deux états de spin augmente avec lui.",
+      "power": "Puissance des ondes radio",
+      "powerHelp": "Règle le nombre de photons radio que la source envoie chaque seconde à travers l’échantillon.",
+      "frequency": "Fréquence des ondes radio",
+      "frequencyHelp": "Fréquence des ondes radio en mégahertz. Les noyaux n’absorbent que près de leur fréquence de résonance.",
+      "radioView": "Affichage des ondes radio",
+      "radioViewHelp": "Montre les ondes radio comme une onde continue ou comme des photons individuels.",
+      "waveView": "Vue ondulatoire",
+      "photonView": "Vue photonique",
+      "fieldArrows": "Afficher les flèches du champ magnétique",
+      "precession": "Afficher la précession des noyaux",
+      "nucleus": "Noyau de l’échantillon",
+      "nucleusHelp": "Choisissez le type de noyau qui remplit l’échantillon. Chacun a son propre rapport gyromagnétique.",
+      "resonanceReached": "En résonance : la fréquence radio correspond à l’écart d’énergie, les noyaux absorbent.",
+      "resonanceLost": "Hors résonance."
     },
-    "currentDetails": "La simulation est dans son état initial.",
-    "controls": {
-      "exampleControl": "Contrôle d'exemple"
+    "nmr": {
+      "screenSummary": {
+        "playArea": "Vingt noyaux atomiques se trouvent dans une chambre placée entre les bobines d’un gros aimant. Chaque noyau pointe soit dans le sens du champ magnétique, son état de plus basse énergie, soit en sens inverse, son état de plus haute énergie. Une source sous la chambre envoie des ondes radio à travers l’échantillon. Un diagramme des niveaux d’énergie indique combien de noyaux occupent chaque état.",
+        "controlArea": "Les commandes règlent le champ principal, le noyau de l’échantillon, la puissance et la fréquence des ondes radio, leur affichage, et l’affichage des flèches du champ et de la précession. Les commandes de temps mettent en pause et avancent pas à pas, et Tout réinitialiser recommence.",
+        "interactionHint": "Augmentez la puissance, puis changez la fréquence ou le champ jusqu’à ce que les noyaux basculent."
+      },
+      "currentDetailsPattern": "Champ {{field}} tesla. Ondes radio à {{frequency}} mégahertz, puissance {{power}} pour cent. {{aligned}} noyaux sur {{total}} sont alignés avec le champ. {{resonance}}",
+      "onResonance": "La source est en résonance.",
+      "offResonance": "La source n’est pas en résonance."
+    },
+    "mri": {
+      "screenSummary": {
+        "playArea": "Une tête remplie de noyaux d’hydrogène se trouve entre les bobines d’un gros aimant, avec des bobines de gradient en dessous et à gauche. Une source envoie des ondes radio à travers la tête. Les noyaux qui absorbent basculent, et en relaxant ils émettent des ondes radio vers un détecteur à droite.",
+        "controlArea": "Les commandes règlent le champ principal, les gradients horizontal et vertical, la puissance et la fréquence des ondes radio, et ce qui est affiché. Un bouton ajoute ou retire une tumeur. Les commandes de temps mettent en pause et avancent pas à pas, et Tout réinitialiser recommence.",
+        "interactionHint": "Activez un gradient pour que la fréquence de résonance varie à travers la tête, puis réglez la fréquence pour sélectionner une tranche."
+      },
+      "currentDetailsPattern": "Champ {{field}} tesla, gradient horizontal {{horizontal}} tesla, gradient vertical {{vertical}} tesla. Ondes radio à {{frequency}} mégahertz, puissance {{power}} pour cent. Le détecteur reçoit {{count}} photons par seconde. {{tumor}}",
+      "tumorPresent": "Une tumeur est présente.",
+      "tumorAbsent": "Aucune tumeur.",
+      "horizontalGradient": "Gradient horizontal",
+      "verticalGradient": "Gradient vertical",
+      "gradientHelp": "Différence de champ entre les deux bords de la chambre, en tesla. Un gradient rend la fréquence de résonance dépendante de la position.",
+      "showHead": "Afficher la tête",
+      "showNuclei": "Afficher les noyaux atomiques",
+      "tumorButtonHelp": "Ajoute ou retire une tumeur, une région de noyaux très rapprochés.",
+      "tumorAdded": "Tumeur ajoutée.",
+      "tumorRemoved": "Tumeur retirée."
+    },
+    "relaxation": {
+      "screenSummary": {
+        "playArea": "Une sphère montre l’aimantation nette des protons d’un tissu par une flèche rouge, le champ principal pointant vers le haut. Une impulsion RF écarte la flèche du champ ; elle précesse ensuite autour du champ pendant que sa composante verticale se rétablit et que sa composante transversale décroît. Deux graphiques enregistrent l’aimantation longitudinale et transversale depuis la dernière impulsion.",
+        "controlArea": "Les commandes choisissent un tissu ou règlent directement T1 et T2, fixent l’angle de bascule, appliquent une impulsion ou ramènent à l’équilibre, et choisissent ce qui est affiché. Les commandes de temps règlent la vitesse, mettent en pause et avancent pas à pas, et Tout réinitialiser recommence.",
+        "interactionHint": "Appliquez une impulsion de 90 degrés et observez les deux types de relaxation, puis comparez les tissus."
+      },
+      "currentDetailsPattern": "{{tissue}} : T1 {{t1}} millisecondes, T2 {{t2}} millisecondes. Aimantation longitudinale {{mz}}, aimantation transversale {{mxy}}.",
+      "tissue": "Tissu",
+      "tissueHelp": "Choisissez un tissu pour charger ses valeurs typiques de T1 et T2 à 1,5 tesla.",
+      "t1": "T1, temps de relaxation longitudinale",
+      "t1Help": "Temps nécessaire pour que l’aimantation dans le sens du champ se rétablisse en grande partie, en millisecondes.",
+      "t2": "T2, temps de relaxation transversale",
+      "t2Help": "Temps de décroissance de l’aimantation transversale, et du signal, en millisecondes. Jamais plus long que T1.",
+      "flipAngle": "Angle de bascule",
+      "flipAngleHelp": "De combien l’impulsion écarte l’aimantation du champ, en degrés.",
+      "applyPulse": "Appliquer une impulsion RF",
+      "applyPulseHelp": "Bascule l’aimantation de l’angle choisi et recommence les graphiques.",
+      "equilibrium": "Retour à l’équilibre",
+      "equilibriumHelp": "Remet l’aimantation dans le sens du champ et efface les graphiques.",
+      "rotatingFrame": "Référentiel tournant",
+      "rotatingFrameHelp": "Vue depuis un référentiel qui tourne avec la précession, de sorte que la flèche cesse de tourner.",
+      "isochromats": "Afficher les spins individuels",
+      "signal": "Afficher le signal",
+      "pulseApplied": "Impulsion appliquée."
     }
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Exemple de bascule"
+    "snapToResonance": "Aimanter les curseurs sur la résonance",
+    "snapToResonanceDescription": "Relâcher le curseur du champ ou de la fréquence près de la résonance le place exactement en résonance, comme dans l’original de PhET."
   }
 }

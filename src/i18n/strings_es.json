@@ -1,21 +1,160 @@
 {
-  "title": "Plantilla de Simulación",
+  "title": "RM simplificada",
   "screens": {
-    "sim": "Simulación"
+    "nmr": "RMN",
+    "mri": "RM",
+    "relaxation": "Relajación"
+  },
+  "common": {
+    "mainMagnet": "Imán principal",
+    "field": "Campo",
+    "teslaPattern": "{{value}} T",
+    "radioSource": "Fuente de ondas de radio",
+    "power": "Potencia",
+    "percentPattern": "{{value}} %",
+    "frequency": "Frecuencia",
+    "megahertzPattern": "{{value}} MHz",
+    "waveView": "Vista de onda",
+    "photonView": "Vista de fotones",
+    "show": "Mostrar",
+    "fieldArrows": "Campo magnético",
+    "precession": "Precesión (ralentizada)",
+    "hint": "Ajusta la potencia y la frecuencia",
+    "sampleNucleus": "Núcleo de la muestra",
+    "energyLevels": "Niveles de energía",
+    "energy": "Energía",
+    "onResonance": "En resonancia",
+    "nuclei": {
+      "hydrogen1": "hidrógeno-1",
+      "nitrogen14": "nitrógeno-14",
+      "sodium23": "sodio-23",
+      "carbon13": "carbono-13",
+      "oxygen17": "oxígeno-17",
+      "sulfur33": "azufre-33",
+      "unknown": "desconocido"
+    }
+  },
+  "mri": {
+    "gradientMagnets": "Bobinas de gradiente",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "head": "Cabeza",
+    "showHead": "Cabeza",
+    "showNuclei": "Núcleos atómicos",
+    "addTumor": "Añadir tumor",
+    "removeTumor": "Quitar tumor",
+    "detector": "Detector",
+    "detectorRatePattern": "{{count}} fotones/s"
+  },
+  "relaxation": {
+    "tissue": "Tejido",
+    "tissues": {
+      "fat": "Grasa",
+      "whiteMatter": "Sustancia blanca",
+      "grayMatter": "Sustancia gris",
+      "muscle": "Músculo",
+      "blood": "Sangre",
+      "csf": "Líquido cefalorraquídeo",
+      "custom": "Personalizado"
+    },
+    "t1": "T₁",
+    "t2": "T₂",
+    "millisecondsPattern": "{{value}} ms",
+    "rfPulse": "Pulso de RF",
+    "flipAngle": "Ángulo de inclinación",
+    "degreesPattern": "{{value}}°",
+    "applyPulse": "Aplicar pulso",
+    "equilibrium": "Volver al equilibrio",
+    "rotatingFrame": "Sistema rotatorio",
+    "isochromats": "Espines individuales",
+    "signal": "Señal",
+    "longitudinalTitle": "Magnetización longitudinal",
+    "transverseTitle": "Magnetización transversal",
+    "timeAxis": "Tiempo desde el pulso (ms)",
+    "mzAxis": "M<sub>z</sub> / M<sub>0</sub>",
+    "mxyAxis": "|M<sub>xy</sub>| / M<sub>0</sub>",
+    "signalNote": "Oscilación de la señal ralentizada para mostrarla",
+    "larmorPattern": "B₀ = {{field}} T,  f = {{frequency}} MHz",
+    "precessionNote": "Precesión ralentizada unas 10⁸ veces",
+    "readoutPattern": "M<sub>z</sub> = {{mz}}   |M<sub>xy</sub>| = {{mxy}}",
+    "pulseHint": "Aplica un pulso para inclinar la magnetización"
   },
   "a11y": {
-    "screenSummary": {
-      "playArea": "El área de juego muestra el contenido principal de la simulación.",
-      "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-      "interactionHint": "Explora la simulación interactuando con sus controles."
+    "common": {
+      "mainField": "Campo magnético principal",
+      "mainFieldHelp": "Campo del imán principal en tesla. La diferencia de energía entre los dos estados de espín crece con él.",
+      "power": "Potencia de las ondas de radio",
+      "powerHelp": "Ajusta cuántos fotones de radio envía la fuente cada segundo a través de la muestra.",
+      "frequency": "Frecuencia de las ondas de radio",
+      "frequencyHelp": "Frecuencia de las ondas de radio en megahercios. Los núcleos solo absorben cerca de su frecuencia de resonancia.",
+      "radioView": "Representación de las ondas de radio",
+      "radioViewHelp": "Muestra las ondas de radio como una onda continua o como fotones individuales.",
+      "waveView": "Vista de onda",
+      "photonView": "Vista de fotones",
+      "fieldArrows": "Mostrar las flechas del campo magnético",
+      "precession": "Mostrar la precesión de los núcleos",
+      "nucleus": "Núcleo de la muestra",
+      "nucleusHelp": "Elige qué tipo de núcleo llena la muestra. Cada uno tiene su propia razón giromagnética.",
+      "resonanceReached": "En resonancia: la frecuencia de radio coincide con la diferencia de energía y los núcleos absorben.",
+      "resonanceLost": "Fuera de resonancia."
     },
-    "currentDetails": "La simulación está en su estado inicial.",
-    "controls": {
-      "exampleControl": "Control de ejemplo"
+    "nmr": {
+      "screenSummary": {
+        "playArea": "Veinte núcleos atómicos están en una cámara entre las bobinas de un gran imán. Cada núcleo apunta en el sentido del campo magnético, su estado de menor energía, o en sentido contrario, su estado de mayor energía. Una fuente bajo la cámara envía ondas de radio a través de la muestra. Un diagrama de niveles de energía muestra cuántos núcleos hay en cada estado.",
+        "controlArea": "Los controles ajustan el campo principal, el núcleo de la muestra, la potencia y la frecuencia de las ondas de radio, cómo se dibujan y si se muestran las flechas del campo y la precesión. Los controles de tiempo pausan y avanzan paso a paso, y Restablecer todo vuelve a empezar.",
+        "interactionHint": "Sube la potencia y luego cambia la frecuencia o el campo hasta que los núcleos empiecen a invertirse."
+      },
+      "currentDetailsPattern": "Campo {{field}} tesla. Ondas de radio a {{frequency}} megahercios, potencia {{power}} por ciento. {{aligned}} de {{total}} núcleos están alineados con el campo. {{resonance}}",
+      "onResonance": "La fuente está en resonancia.",
+      "offResonance": "La fuente no está en resonancia."
+    },
+    "mri": {
+      "screenSummary": {
+        "playArea": "Una cabeza llena de núcleos de hidrógeno está entre las bobinas de un gran imán, con bobinas de gradiente debajo y a la izquierda. Una fuente envía ondas de radio a través de la cabeza. Los núcleos que absorben se invierten y, al relajarse, emiten ondas de radio hacia un detector a la derecha.",
+        "controlArea": "Los controles ajustan el campo principal, los gradientes horizontal y vertical, la potencia y la frecuencia de las ondas de radio y lo que se muestra. Un botón añade o quita un tumor. Los controles de tiempo pausan y avanzan paso a paso, y Restablecer todo vuelve a empezar.",
+        "interactionHint": "Activa un gradiente para que la frecuencia de resonancia cambie a lo largo de la cabeza y luego ajusta la frecuencia para seleccionar un corte."
+      },
+      "currentDetailsPattern": "Campo {{field}} tesla, gradiente horizontal {{horizontal}} tesla, gradiente vertical {{vertical}} tesla. Ondas de radio a {{frequency}} megahercios, potencia {{power}} por ciento. El detector recibe {{count}} fotones por segundo. {{tumor}}",
+      "tumorPresent": "Hay un tumor.",
+      "tumorAbsent": "No hay tumor.",
+      "horizontalGradient": "Gradiente horizontal",
+      "verticalGradient": "Gradiente vertical",
+      "gradientHelp": "Diferencia de campo entre los dos bordes de la cámara, en tesla. Un gradiente hace que la frecuencia de resonancia dependa de la posición.",
+      "showHead": "Mostrar la cabeza",
+      "showNuclei": "Mostrar los núcleos atómicos",
+      "tumorButtonHelp": "Añade o quita un tumor, una región de núcleos muy juntos.",
+      "tumorAdded": "Tumor añadido.",
+      "tumorRemoved": "Tumor quitado."
+    },
+    "relaxation": {
+      "screenSummary": {
+        "playArea": "Una esfera muestra la magnetización neta de los protones de un tejido como una flecha roja, con el campo principal hacia arriba. Un pulso de RF inclina la flecha respecto al campo; después precesa alrededor del campo mientras su componente vertical se recupera y su componente transversal decae. Dos gráficas registran la magnetización longitudinal y transversal desde el último pulso.",
+        "controlArea": "Los controles eligen un tejido o fijan T1 y T2 directamente, ajustan el ángulo de inclinación, aplican un pulso o vuelven al equilibrio, y eligen qué se muestra. Los controles de tiempo ajustan la velocidad, pausan y avanzan paso a paso, y Restablecer todo vuelve a empezar.",
+        "interactionHint": "Aplica un pulso de 90 grados y observa los dos tipos de relajación; luego compara tejidos."
+      },
+      "currentDetailsPattern": "{{tissue}}: T1 {{t1}} milisegundos, T2 {{t2}} milisegundos. Magnetización longitudinal {{mz}}, magnetización transversal {{mxy}}.",
+      "tissue": "Tejido",
+      "tissueHelp": "Elige un tejido para cargar sus valores típicos de T1 y T2 a 1,5 tesla.",
+      "t1": "T1, tiempo de relajación longitudinal",
+      "t1Help": "Tiempo para que la magnetización en el sentido del campo se recupere en gran parte, en milisegundos.",
+      "t2": "T2, tiempo de relajación transversal",
+      "t2Help": "Tiempo en que decae la magnetización transversal, y la señal, en milisegundos. Nunca es mayor que T1.",
+      "flipAngle": "Ángulo de inclinación",
+      "flipAngleHelp": "Cuánto inclina el pulso la magnetización respecto al campo, en grados.",
+      "applyPulse": "Aplicar pulso de RF",
+      "applyPulseHelp": "Inclina la magnetización el ángulo elegido y reinicia las gráficas.",
+      "equilibrium": "Volver al equilibrio",
+      "equilibriumHelp": "Devuelve la magnetización al sentido del campo y borra las gráficas.",
+      "rotatingFrame": "Sistema rotatorio",
+      "rotatingFrameHelp": "Vista desde un sistema que gira con la precesión, de modo que la flecha deja de girar.",
+      "isochromats": "Mostrar los espines individuales",
+      "signal": "Mostrar la señal",
+      "pulseApplied": "Pulso aplicado."
     }
   },
   "preferences": {
     "title": "Simulación",
-    "exampleToggle": "Ejemplo de alternancia"
+    "snapToResonance": "Ajustar los controles a la resonancia",
+    "snapToResonanceDescription": "Al soltar el control del campo o de la frecuencia cerca de la resonancia, se coloca exactamente en resonancia, como en el original de PhET."
   }
 }

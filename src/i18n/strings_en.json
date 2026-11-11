@@ -1,21 +1,160 @@
 {
-  "title": "SceneryStack Template",
+  "title": "Simplified MRI",
   "screens": {
-    "sim": "Sim"
+    "nmr": "NMR",
+    "mri": "MRI",
+    "relaxation": "Relaxation"
+  },
+  "common": {
+    "mainMagnet": "Main Magnet",
+    "field": "Field",
+    "teslaPattern": "{{value}} T",
+    "radioSource": "Radio-Wave Source",
+    "power": "Power",
+    "percentPattern": "{{value}}%",
+    "frequency": "Frequency",
+    "megahertzPattern": "{{value}} MHz",
+    "waveView": "Wave view",
+    "photonView": "Photon view",
+    "show": "Show",
+    "fieldArrows": "Magnetic field",
+    "precession": "Precession (slowed)",
+    "hint": "Adjust the power and frequency",
+    "sampleNucleus": "Sample Nucleus",
+    "energyLevels": "Energy Levels",
+    "energy": "Energy",
+    "onResonance": "On resonance",
+    "nuclei": {
+      "hydrogen1": "hydrogen-1",
+      "nitrogen14": "nitrogen-14",
+      "sodium23": "sodium-23",
+      "carbon13": "carbon-13",
+      "oxygen17": "oxygen-17",
+      "sulfur33": "sulfur-33",
+      "unknown": "unknown"
+    }
+  },
+  "mri": {
+    "gradientMagnets": "Gradient Magnets",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "head": "Head",
+    "showHead": "Head",
+    "showNuclei": "Atomic nuclei",
+    "addTumor": "Add tumor",
+    "removeTumor": "Remove tumor",
+    "detector": "Detector",
+    "detectorRatePattern": "{{count}} photons/s"
+  },
+  "relaxation": {
+    "tissue": "Tissue",
+    "tissues": {
+      "fat": "Fat",
+      "whiteMatter": "White matter",
+      "grayMatter": "Gray matter",
+      "muscle": "Muscle",
+      "blood": "Blood",
+      "csf": "Cerebrospinal fluid",
+      "custom": "Custom"
+    },
+    "t1": "T₁",
+    "t2": "T₂",
+    "millisecondsPattern": "{{value}} ms",
+    "rfPulse": "RF Pulse",
+    "flipAngle": "Flip angle",
+    "degreesPattern": "{{value}}°",
+    "applyPulse": "Apply pulse",
+    "equilibrium": "Back to equilibrium",
+    "rotatingFrame": "Rotating frame",
+    "isochromats": "Individual spins",
+    "signal": "Signal",
+    "longitudinalTitle": "Longitudinal magnetization",
+    "transverseTitle": "Transverse magnetization",
+    "timeAxis": "Time since pulse (ms)",
+    "mzAxis": "M<sub>z</sub> / M<sub>0</sub>",
+    "mxyAxis": "|M<sub>xy</sub>| / M<sub>0</sub>",
+    "signalNote": "Signal oscillation slowed for display",
+    "larmorPattern": "B₀ = {{field}} T,  f = {{frequency}} MHz",
+    "precessionNote": "Precession slowed about 10⁸ times",
+    "readoutPattern": "M<sub>z</sub> = {{mz}}   |M<sub>xy</sub>| = {{mxy}}",
+    "pulseHint": "Apply a pulse to tip the magnetization"
   },
   "a11y": {
-    "screenSummary": {
-      "playArea": "The play area shows the main simulation content.",
-      "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-      "interactionHint": "Explore the simulation by interacting with its controls."
+    "common": {
+      "mainField": "Main magnetic field",
+      "mainFieldHelp": "Field of the main magnet in tesla. The energy gap between the two spin states grows with it.",
+      "power": "Radio-wave power",
+      "powerHelp": "Sets how many radio-wave photons the source sends up through the sample each second.",
+      "frequency": "Radio-wave frequency",
+      "frequencyHelp": "Frequency of the radio waves in megahertz. Nuclei absorb only near their resonance frequency.",
+      "radioView": "Radio-wave display",
+      "radioViewHelp": "Show the radio waves as a continuous wave or as individual photons.",
+      "waveView": "Wave view",
+      "photonView": "Photon view",
+      "fieldArrows": "Show magnetic field arrows",
+      "precession": "Show precession of the nuclei",
+      "nucleus": "Sample nucleus",
+      "nucleusHelp": "Choose which kind of nucleus fills the sample. Each has its own gyromagnetic ratio.",
+      "resonanceReached": "On resonance: the radio frequency matches the energy gap, so nuclei absorb.",
+      "resonanceLost": "Off resonance."
     },
-    "currentDetails": "The simulation is in its initial state.",
-    "controls": {
-      "exampleControl": "Example control"
+    "nmr": {
+      "screenSummary": {
+        "playArea": "Twenty atomic nuclei sit in a sample chamber between the coils of a large magnet. Each nucleus points either along the magnetic field, its lower-energy state, or against it, its higher-energy state. A radio-wave source below the chamber sends radio waves up through the sample. An energy-level diagram shows how many nuclei are in each state.",
+        "controlArea": "Controls set the main magnetic field, the sample nucleus, the radio-wave power and frequency, how the radio waves are drawn, and whether field arrows and precession are shown. Time controls pause and step the simulation, and Reset All starts over.",
+        "interactionHint": "Turn up the power, then change the frequency or the field until the nuclei start to flip."
+      },
+      "currentDetailsPattern": "Field {{field}} tesla. Radio waves at {{frequency}} megahertz, power {{power}} percent. {{aligned}} of {{total}} nuclei are aligned with the field. {{resonance}}",
+      "onResonance": "The source is on resonance.",
+      "offResonance": "The source is not on resonance."
+    },
+    "mri": {
+      "screenSummary": {
+        "playArea": "A head full of hydrogen nuclei lies between the coils of a large magnet, with gradient coils below and to the left. A radio-wave source sends radio waves up through the head. Nuclei that absorb flip, and when they relax they emit radio waves toward a detector on the right.",
+        "controlArea": "Controls set the main field, the horizontal and vertical gradients, the radio-wave power and frequency, and what is shown. A button adds or removes a tumor. Time controls pause and step the simulation, and Reset All starts over.",
+        "interactionHint": "Turn on a gradient so the resonance frequency changes across the head, then tune the frequency to pick out one slice."
+      },
+      "currentDetailsPattern": "Field {{field}} tesla, horizontal gradient {{horizontal}} tesla, vertical gradient {{vertical}} tesla. Radio waves at {{frequency}} megahertz, power {{power}} percent. The detector receives {{count}} photons per second. {{tumor}}",
+      "tumorPresent": "A tumor is present.",
+      "tumorAbsent": "No tumor.",
+      "horizontalGradient": "Horizontal gradient",
+      "verticalGradient": "Vertical gradient",
+      "gradientHelp": "Difference in field between the two edges of the chamber, in tesla. A gradient makes the resonance frequency depend on position.",
+      "showHead": "Show head",
+      "showNuclei": "Show atomic nuclei",
+      "tumorButtonHelp": "Adds or removes a tumor, a region of densely packed nuclei.",
+      "tumorAdded": "Tumor added.",
+      "tumorRemoved": "Tumor removed."
+    },
+    "relaxation": {
+      "screenSummary": {
+        "playArea": "A sphere shows the net magnetization of a tissue's protons as a red arrow, with the main field pointing up. An RF pulse tips the arrow away from the field; it then precesses around the field while its upward part recovers and its sideways part decays. Two graphs record the longitudinal and transverse magnetization since the last pulse.",
+        "controlArea": "Controls choose a tissue or set T1 and T2 directly, set the flip angle, apply a pulse or return to equilibrium, and choose what is shown. Time controls set the speed, pause and step, and Reset All starts over.",
+        "interactionHint": "Apply a 90 degree pulse and watch the two kinds of relaxation, then compare tissues."
+      },
+      "currentDetailsPattern": "{{tissue}}: T1 {{t1}} milliseconds, T2 {{t2}} milliseconds. Longitudinal magnetization {{mz}}, transverse magnetization {{mxy}}.",
+      "tissue": "Tissue",
+      "tissueHelp": "Choose a tissue to load its typical T1 and T2 at 1.5 tesla.",
+      "t1": "T1, longitudinal relaxation time",
+      "t1Help": "Time for the magnetization along the field to recover most of the way, in milliseconds.",
+      "t2": "T2, transverse relaxation time",
+      "t2Help": "Time for the sideways magnetization, and the signal, to decay, in milliseconds. Never longer than T1.",
+      "flipAngle": "Flip angle",
+      "flipAngleHelp": "How far the pulse tips the magnetization away from the field, in degrees.",
+      "applyPulse": "Apply RF pulse",
+      "applyPulseHelp": "Tips the magnetization by the flip angle and restarts the graphs.",
+      "equilibrium": "Back to equilibrium",
+      "equilibriumHelp": "Puts the magnetization back along the field and clears the graphs.",
+      "rotatingFrame": "Rotating frame",
+      "rotatingFrameHelp": "View from a frame turning with the precession, so the arrow stops circling.",
+      "isochromats": "Show individual spins",
+      "signal": "Show signal",
+      "pulseApplied": "Pulse applied."
     }
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Example Toggle"
+    "snapToResonance": "Snap sliders to resonance",
+    "snapToResonanceDescription": "Releasing the field or frequency slider close to resonance moves it exactly onto resonance, as in PhET's original."
   }
 }

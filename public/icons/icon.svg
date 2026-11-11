@@ -1,7 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#1a1a2e"/>
-  <circle cx="256" cy="256" r="180" fill="none" stroke="#4fc3f7" stroke-width="20"/>
-  <circle cx="256" cy="256" r="60" fill="#4fc3f7"/>
-  <ellipse cx="256" cy="256" rx="180" ry="60" fill="none" stroke="#4fc3f7" stroke-width="12" opacity="0.6" transform="rotate(30 256 256)"/>
-  <ellipse cx="256" cy="256" rx="180" ry="60" fill="none" stroke="#4fc3f7" stroke-width="12" opacity="0.6" transform="rotate(-30 256 256)"/>
+  <!-- magnet coils -->
+  <g fill="none" stroke="#c9962b" stroke-width="10">
+    <ellipse cx="256" cy="70" rx="190" ry="14"/>
+    <ellipse cx="256" cy="98" rx="190" ry="14"/>
+    <ellipse cx="256" cy="414" rx="190" ry="14"/>
+    <ellipse cx="256" cy="442" rx="190" ry="14"/>
+  </g>
+  <!-- precession cone -->
+  <ellipse cx="256" cy="168" rx="62" ry="18" fill="none" stroke="#e0e0e0" stroke-width="6" opacity="0.6"/>
+  <!-- nucleus: arrow through a spinning top -->
+  <polygon points="244,330 244,190 222,190 276,128 300,190 278,190 278,330" fill="#ff5252" stroke="#0b1020" stroke-width="4" transform="rotate(14 256 256)"/>
+  <ellipse cx="256" cy="268" rx="120" ry="48" fill="#4dd0e1" stroke="#0b1020" stroke-width="5"/>
+  <ellipse cx="256" cy="262" rx="38" ry="14" fill="#0b1020" opacity="0.5"/>
+  <!-- radio wave -->
+  <path d="M 40 380 q 20 -30 40 0 t 40 0 t 40 0" fill="none" stroke="#66bb6a" stroke-width="10" stroke-linecap="round"/>
 </svg>
