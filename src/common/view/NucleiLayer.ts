@@ -67,8 +67,9 @@ export class NucleiLayer extends Node {
   }
 
   private updateGlyph(nucleus: Nucleus, glyph: NucleusGlyph): void {
-    // Model orientation 0 is along the field (up on screen); scenery rotation is clockwise.
-    glyph.rotation = nucleus.orientation;
+    // Model orientation 0 is along the local field; scenery rotation is clockwise.
+    const { x, y } = nucleus.position;
+    glyph.rotation = nucleus.orientation + (this.model.fieldAt(x, y) < 0 ? Math.PI : 0);
     glyph.cone.visible = this.model.precessionVisibleProperty.value;
     if (this.model.precessionVisibleProperty.value) {
       // Side-on view of an arrow tilted from the axis and turning about it.

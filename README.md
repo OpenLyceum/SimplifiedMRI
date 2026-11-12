@@ -21,7 +21,7 @@ runs offline as a Progressive Web App.
   gradient on, each frequency excites one slice; sweep it to find the tumour.
 - **Relaxation** (new). A tissue's net magnetization on a sphere: apply a pulse of any flip
   angle and watch it nutate, precess and relax. Graphs of Mz recovering with T1 and |Mxy| (and
-  the signal) decaying with T2; individual spins show the dephasing behind T2. Six tissues with
+  the signal) decaying with T2; individual spins illustrate loss of transverse coherence. Six tissues with
   typical 1.5 T values, or set T1 and T2 yourself.
 - **Physics fixes over PhET's original:** emitted photons carry the right frequency; strong RF
   saturates the populations (stimulated emission) instead of inverting them; absorption follows

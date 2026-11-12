@@ -25,12 +25,14 @@ B(x, y) = B0 + Gx (x − W/2)/W + Gy (y − H/2)/H, with G from 0 to 0.2 T.
 
 ### Resonance
 
-A nucleus at position r resonates at its Larmor frequency f(r) = γ B(r). Gyromagnetic ratios
+A nucleus at position r resonates at its Larmor frequency f(r) = γ |B(r)|. The sign of B sets the local field direction and the
+direction of display precession. Gyromagnetic ratios
 (|γ|/2π, MHz/T): ¹H 42.577, ¹⁴N 3.077, ²³Na 11.262, ¹³C 10.708, ¹⁷O 5.772, ³³S 3.272, and
 the unknown nucleus ⁶⁵Cu 12.103. (PhET's values, identified by isotope. ¹⁷O's γ is negative;
 only its magnitude matters here.)
 
-A photon of frequency f passing within 1.8 cm of a nucleus interacts once, with probability
+A photon of frequency f gets one interaction roll when its path passes within 1.8 cm of a nucleus,
+with probability
 
 P = 0.6 exp(−(f − f(r))² / 2σ²), σ = 0.35 MHz.
 
@@ -50,7 +52,7 @@ spread 50%) one nucleus flips toward the target. These thermal flips do not emit
 ### Not to scale
 
 - **Population excess.** The real excess at 3 T and 310 K is tanh(hf/2kT) ≈ 1 × 10⁻⁵
-  (`thermalAlignedExcess`, checked in the tests). The sim uses up to 40%.
+  (`thermalAlignedExcess`, checked in the tests). The sim uses a 90/10 split at 3 T, an 80% fractional excess.
 - **Photon speed.** 18 cm/s, not c.
 - **Relaxation.** 0.83 s, about real T1 for these tissues, but the delay is a random wait, not the
   exponential recovery the Relaxation screen shows.
@@ -79,7 +81,7 @@ the readout is the count over the last second.
 | Emitted photons used the lower coil's field, B0/2 | γB at the emitting nucleus | They were emitted at half the absorbed frequency. |
 | Absorption only | absorption and stimulated emission, at equal rates | Resonant RF pumped nearly every nucleus into the upper state (population inversion). Real RF saturates toward 50/50. |
 | Hard window, |Δf| < ε = γ_H·3 T/150·4 ≈ 3.4 MHz | Gaussian line, σ = 0.35 MHz | The window was as wide as the whole gradient spread, so a gradient could barely select a slice. |
-| One absorption roll per frame while overlapping | One roll per photon–nucleus encounter | PhET's rate depended on the frame rate. |
+| One absorption roll per frame while overlapping | One roll per photon–nucleus encounter along the photon path | Repeated frames inside the same capture circle no longer create extra rolls, and a step can detect an encounter between its endpoints. |
 | Absorption probability rising with distance from the source | Uniform | PhET's `LinearCollisionProbability` subtracted the absolute y of the nucleus, which reversed the intended attenuation. |
 | Target aligned fraction 0.9(0.5 + 0.5B/3), 45% at 0 T | 0.5 + 0.4B/3 | Equal populations at zero field. |
 | Frequency 10–110 MHz | 1–130 MHz | Nitrogen-14 and sulfur-33 could never reach resonance, and hydrogen above 2.58 T could not either. |
@@ -101,9 +103,9 @@ The net magnetization M of a tissue's protons, in units of M0, at 1.5 T (63.9 MH
 - **Precession.** In the lab frame, M turns about B0 at 0.6 rev/s of wall time (slowed about
   10⁸ times). The rotating-frame view removes this.
 - **Isochromats.** Twelve spins with frequency offsets at the quantiles of a Lorentzian of half
-  width 1/T2, the distribution whose dephasing gives an exponential T2 decay. Each keeps unit
-  length, tipped no further than the pulse tipped M. They illustrate dephasing; the net arrow and
-  the graphs use the exact solution.
+  width 1/T2. The fixed offsets qualitatively illustrate how transverse coherence is lost.
+  In MRI, static frequency offsets produce reversible dephasing that contributes to T2*.
+  The net arrow and the graphs use the exact Bloch solution with intrinsic T2.
 - **Signal.** Mxy cos(ωt), with ω chosen to give 12 oscillations across the transverse graph. The
   real signal oscillates at 63.9 MHz.
 - **Tissues (1.5 T, ms).** Fat 340/60, white matter 880/70, gray matter 1120/95, muscle 1010/45,

@@ -2,7 +2,9 @@
  * Unit tests for the Relaxation screen: exact Bloch relaxation and the screen model.
  */
 
-import { describe, expect, it } from "vitest";
+import { LinePlot } from "scenerystack/bamboo";
+import { TimeSpeed } from "scenerystack/scenery-phet";
+import { describe, expect, it, vi } from "vitest";
 import {
   chooseWindow,
   EQUILIBRIUM,
@@ -14,6 +16,7 @@ import {
 } from "../src/relaxation/model/blochPhysics.js";
 import { RelaxationModel } from "../src/relaxation/model/RelaxationModel.js";
 import { Tissue } from "../src/relaxation/model/Tissue.js";
+import { RelaxationChartsNode } from "../src/relaxation/view/RelaxationChartsNode.js";
 import { RELAXATION } from "../src/SimplifiedMRIConstants.js";
 
 describe("Bloch physics", () => {
@@ -83,6 +86,20 @@ describe("RelaxationModel", () => {
     expect(model.tissueProperty.value).toBe(Tissue.CUSTOM);
   });
 
+  it("clears each custom run when either relaxation time changes", () => {
+    const model = new RelaxationModel();
+    model.tissueProperty.value = Tissue.CUSTOM;
+    for (const property of [model.t1Property, model.t2Property]) {
+      model.applyPulse();
+      run(model, 1);
+      expect(model.samples.length).toBeGreaterThan(0);
+      property.value += 10;
+      expect(model.samples).toHaveLength(0);
+      expect(model.tissueTime).toBeNull();
+      expect(model.magnetization).toEqual(EQUILIBRIUM);
+    }
+  });
+
   it("never lets T2 exceed T1", () => {
     const model = new RelaxationModel();
     model.t2Property.value = 2000;
@@ -107,6 +124,26 @@ describe("RelaxationModel", () => {
     expect(model.mxyProperty.value).toBeCloseTo(Math.exp(-elapsed / t2), 6);
     expect(model.mzProperty.value).toBeCloseTo(longitudinalAfterPulse(Math.PI / 2, elapsed, t1), 6);
     expect(model.samples.length).toBeGreaterThan(10);
+  });
+
+  it("resolves the display carrier between Fast frames with a short T2", () => {
+    const model = new RelaxationModel();
+    model.t2Property.value = 10;
+    model.timeSpeedProperty.value = TimeSpeed.FAST;
+    const charts = new RelaxationChartsNode(model);
+    model.applyPulse();
+    run(model, RELAXATION.PULSE_DURATION);
+    model.stepModel(1 / 60);
+
+    const plotUpdates = vi.spyOn(LinePlot.prototype, "setDataSet");
+    charts.update();
+    const signal = plotUpdates.mock.lastCall?.[0] ?? [];
+    plotUpdates.mockRestore();
+
+    expect(model.tissueTime).toBeCloseTo(1000 / 60);
+    expect(signal.length).toBeGreaterThan(30);
+    expect(signal.some((point) => (point?.y ?? 0) < -0.5)).toBe(true);
+    expect(signal.at(-1)?.x).toBeCloseTo(1000 / 60);
   });
 
   it("returns to equilibrium on reset", () => {

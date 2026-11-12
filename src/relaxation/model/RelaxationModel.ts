@@ -127,8 +127,13 @@ export class RelaxationModel implements TModel {
       this.returnToEquilibrium();
     });
     const markCustom = (): void => {
-      if (!this.settingFromTissue) {
+      if (this.settingFromTissue) {
+        return;
+      }
+      if (this.tissueProperty.value !== Tissue.CUSTOM) {
         this.tissueProperty.value = Tissue.CUSTOM;
+      } else if (this.tissueTime !== null || this.pulseActiveProperty.value) {
+        this.returnToEquilibrium();
       }
     };
 

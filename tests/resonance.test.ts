@@ -5,6 +5,7 @@
 import { Random } from "scenerystack/dot";
 import { describe, expect, it } from "vitest";
 import { NucleusType } from "../src/common/model/NucleusType.js";
+import { Photon } from "../src/common/model/Photon.js";
 import {
   absorptionProbability,
   larmorFrequency,
@@ -123,6 +124,41 @@ describe("ResonanceModel", () => {
     expect(model.fieldAt(CHAMBER.WIDTH, CHAMBER.HEIGHT / 2)).toBeCloseTo(1.1, 12);
     expect(model.fieldAt(0, CHAMBER.HEIGHT / 2)).toBeCloseTo(0.9, 12);
     expect(model.fieldAt(CHAMBER.WIDTH / 2, CHAMBER.HEIGHT)).toBeCloseTo(1.05, 12);
+  });
+
+  it("detects a grazing encounter even when both frame endpoints miss the nucleus", () => {
+    for (const dt of [0.1, 0.05]) {
+      const model = new NMRModel({ random: seeded() });
+      const nucleus = model.nuclei.find(({ position }) => position.x === 4 && Math.abs(position.y - 4.2) < 1e-8);
+      expect(nucleus).toBeDefined();
+      // Off resonance so the photon survives and we can check its encounter history.
+      const photon = new Photon(5.75, 3.1, 0, RADIO.PHOTON_SPEED, 130, false);
+      model.photons.push(photon);
+      for (let elapsed = 0; elapsed < 0.1; elapsed += dt) {
+        model.stepModel(dt);
+      }
+      expect([...photon.encountered]).toEqual([nucleus]);
+    }
+  });
+
+  it("uses a positive transition frequency and reversed precession in a reversed local field", () => {
+    const model = new MRIModel({ random: seeded() });
+    model.mainFieldProperty.value = 0;
+    model.horizontalGradientProperty.value = 0.2;
+    const nucleus = model.nuclei.find(({ position }) => position.x < CHAMBER.WIDTH / 2);
+    if (!nucleus) {
+      throw new Error("Expected a nucleus on the negative-field side");
+    }
+    const { x, y } = nucleus.position;
+    const frequency = NucleusType.HYDROGEN_1.gyromagneticRatio * Math.abs(model.fieldAt(x, y));
+    expect(frequency).toBeGreaterThan(0);
+    expect(model.resonanceFrequencyAt(x, y)).toBeCloseTo(frequency, 12);
+    expect(model.precessionRateAt(x, y)).toBeLessThan(0);
+
+    nucleus.setSpinState("antiAligned", model.random);
+    nucleus.relaxationCountdown = 0.001;
+    model.stepModel(0.01);
+    expect(model.photons.find((photon) => photon.isEmitted)?.frequency).toBeCloseTo(frequency, 12);
   });
 
   it("emits photons at a rate set by the power", () => {

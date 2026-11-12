@@ -11,8 +11,7 @@
  *   - Strong RF saturates the populations toward 50/50 through stimulated emission. PhET
  *     modelled absorption only, so resonant RF inverted the populations.
  *   - Absorption follows a Gaussian line (σ = 0.35 MHz) instead of a hard ±3.4 MHz window,
- *     and each photon gets one absorption roll per nucleus it passes, so the rate does not
- *     depend on the frame rate.
+ *     and each photon gets one absorption roll per nucleus its path crosses.
  *   - The absorption probability is the same everywhere. PhET's grew with distance from
  *     the source, apparently a sign error in its "linear probability" strategy.
  *   - Populations run from 50/50 at zero field to 90/10 at 3 T. PhET's formula gave 45/55
@@ -159,7 +158,7 @@ export class ResonanceModel implements TModel {
 
   /** Display precession rate (rev/s) at a point. */
   public precessionRateAt(x: number, y: number): number {
-    return this.resonanceFrequencyAt(x, y) * NUCLEUS.PRECESSION_DISPLAY_RATE;
+    return this.nucleusTypeProperty.value.gyromagneticRatio * this.fieldAt(x, y) * NUCLEUS.PRECESSION_DISPLAY_RATE;
   }
 
   /**
@@ -232,7 +231,6 @@ export class ResonanceModel implements TModel {
 
     this.emitIncomingPhotons(h);
     this.movePhotons(h);
-    this.absorb();
     this.relax(h);
     this.thermalNoise(h);
 
@@ -254,70 +252,97 @@ export class ResonanceModel implements TModel {
     }
   }
 
-  /** Moves photons and removes those that left the chamber or reached the detector. */
+  /** Moves photons, processes incoming encounters, and removes photons that leave. */
   private movePhotons(dt: number): void {
     const detectorX = CHAMBER.WIDTH + DETECTOR.GAP;
+    const stimulated: Photon[] = [];
     for (let i = this.photons.length - 1; i >= 0; i--) {
       const photon = this.photons[i];
       if (!photon) {
         continue;
       }
+      const startY = photon.y;
       photon.step(dt);
       if (photon.isEmitted) {
         if (photon.x >= detectorX) {
           this.photons.splice(i, 1);
           this.detector?.detect(this.time);
         }
-      } else if (photon.y > CHAMBER.HEIGHT + RESONANCE.CAPTURE_RADIUS) {
-        this.photons.splice(i, 1);
-      }
-    }
-  }
-
-  /**
-   * Each incoming photon gets one interaction roll for every nucleus it passes, with the
-   * probability set by the line shape:
-   *   - an aligned nucleus absorbs the photon and flips up, to relax later;
-   *   - an anti-aligned nucleus is driven down by stimulated emission: it flips to aligned
-   *     and a second photon, identical to the first, joins the beam.
-   * Because both rates are equal, strong RF saturates the populations toward 50/50 but
-   * never inverts them. (PhET had absorption only, so the RF pumped nearly every nucleus up.)
-   */
-  private absorb(): void {
-    const radiusSquared = RESONANCE.CAPTURE_RADIUS * RESONANCE.CAPTURE_RADIUS;
-    const stimulated: Photon[] = [];
-    for (let i = this.photons.length - 1; i >= 0; i--) {
-      const photon = this.photons[i];
-      if (!photon || photon.isEmitted) {
-        continue;
-      }
-      for (const nucleus of this.nuclei) {
-        const dx = photon.x - nucleus.position.x;
-        const dy = photon.y - nucleus.position.y;
-        if (dx * dx + dy * dy >= radiusSquared || photon.encountered.has(nucleus)) {
-          continue;
-        }
-        photon.encountered.add(nucleus);
-        const detuning = photon.frequency - this.resonanceFrequencyAt(nucleus.position.x, nucleus.position.y);
-        if (this.random.nextDouble() >= absorptionProbability(detuning)) {
-          continue;
-        }
-        if (nucleus.isAligned) {
-          nucleus.setSpinState("antiAligned", this.random);
-          nucleus.relaxationCountdown = this.drawWait(SPIN.RELAXATION_TIME);
+      } else {
+        const absorbed = this.interactAlongPath(photon, startY, stimulated);
+        if (absorbed || photon.y > CHAMBER.HEIGHT + RESONANCE.CAPTURE_RADIUS) {
           this.photons.splice(i, 1);
-          break;
         }
-        nucleus.relaxationCountdown = null;
-        nucleus.setSpinState("aligned", this.random);
-        const twin = new Photon(photon.x, photon.y, photon.vx, photon.vy, photon.frequency, false);
-        for (const passed of photon.encountered) {
-          twin.encountered.add(passed);
-        }
-        stimulated.push(twin);
       }
     }
     this.photons.push(...stimulated);
+  }
+
+  /**
+   * Incoming photons travel straight up. Find where the segment enters each capture circle
+   * and visit those circles in order, including for stimulated photons created along the path.
+   * Returns whether the original photon was absorbed.
+   */
+  private interactAlongPath(photon: Photon, startY: number, stimulated: Photon[]): boolean {
+    const radiusSquared = RESONANCE.CAPTURE_RADIUS ** 2;
+    const encounters: { nucleus: Nucleus; entryY: number }[] = [];
+    for (const nucleus of this.nuclei) {
+      const halfChordSquared = radiusSquared - (photon.x - nucleus.position.x) ** 2;
+      if (halfChordSquared <= 0 || photon.encountered.has(nucleus)) {
+        continue;
+      }
+      const halfChord = Math.sqrt(halfChordSquared);
+      const entryY = nucleus.position.y - halfChord;
+      if (entryY < photon.y && nucleus.position.y + halfChord > startY) {
+        encounters.push({ nucleus, entryY: Math.max(entryY, startY) });
+      }
+    }
+    if (encounters.length === 0) {
+      return false;
+    }
+    encounters.sort((a, b) => a.entryY - b.entryY);
+
+    const beam = [photon];
+    for (const { nucleus } of encounters) {
+      this.interactWithNucleus(beam, nucleus, photon.frequency);
+      if (beam.length === 0) {
+        break;
+      }
+    }
+    const originalSurvives = beam[0] === photon;
+    if (photon.y <= CHAMBER.HEIGHT + RESONANCE.CAPTURE_RADIUS) {
+      stimulated.push(...beam.slice(originalSurvives ? 1 : 0));
+    }
+    return !originalSurvives;
+  }
+
+  private interactWithNucleus(beam: Photon[], nucleus: Nucleus, frequency: number): void {
+    const detuning = frequency - this.resonanceFrequencyAt(nucleus.position.x, nucleus.position.y);
+    const probability = absorptionProbability(detuning);
+    // Twins enter the beam after this encounter. They can interact with later nuclei.
+    for (let i = beam.length - 1; i >= 0; i--) {
+      const ray = beam[i];
+      if (!ray) {
+        continue;
+      }
+      ray.encountered.add(nucleus);
+      if (this.random.nextDouble() >= probability) {
+        continue;
+      }
+      if (nucleus.isAligned) {
+        nucleus.setSpinState("antiAligned", this.random);
+        nucleus.relaxationCountdown = this.drawWait(SPIN.RELAXATION_TIME);
+        beam.splice(i, 1);
+      } else {
+        nucleus.relaxationCountdown = null;
+        nucleus.setSpinState("aligned", this.random);
+        const twin = new Photon(ray.x, ray.y, ray.vx, ray.vy, ray.frequency, false);
+        for (const passed of ray.encountered) {
+          twin.encountered.add(passed);
+        }
+        beam.push(twin);
+      }
+    }
   }
 
   /** Excited nuclei whose wait is over return to the aligned state and emit toward +x. */
