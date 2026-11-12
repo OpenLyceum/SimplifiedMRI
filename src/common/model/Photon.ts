@@ -27,7 +27,7 @@ export class Photon {
 
   /**
    * Nuclei this photon has already passed within capture range of. Each encounter gets one
-   * absorption roll, so the chance of absorption does not depend on the frame rate.
+   * interaction roll, even if the photon remains in range across several steps.
    */
   public readonly encountered = new Set<Nucleus>();
 

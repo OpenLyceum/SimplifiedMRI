@@ -5,7 +5,7 @@
  * B0 pointing up:
  *
  *   red arrow       the net magnetization M
- *   blue arrows     individual spin isochromats fanning out as they dephase (T2)
+ *   blue arrows     individual spin isochromats fanning out to illustrate loss of transverse coherence
  *   faint trail     the recent path of M's tip (the nutation spiral during a pulse)
  *   dashed lines    M's projections onto the transverse plane and the field axis
  *

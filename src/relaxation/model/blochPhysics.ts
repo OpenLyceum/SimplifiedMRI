@@ -55,9 +55,8 @@ export function longitudinalAfterPulse(flipAngle: number, t: number, t1: number)
 
 /**
  * Frequency offsets of the spin isochromats (rad/ms): quantiles of a Lorentzian of half
- * width 1/T2, the distribution whose dephasing gives an exponential decay with time
- * constant T2. With a dozen spins this is only an illustration of dephasing; the net
- * magnetization drawn and plotted is the exact Bloch solution.
+ * width 1/T2. Fixed offsets illustrate loss of coherence and produce reversible dephasing.
+ * The net magnetization drawn and plotted follows the exact Bloch solution with intrinsic T2.
  */
 export function isochromatOffsets(t2: number, count: number = RELAXATION.ISOCHROMAT_COUNT): number[] {
   const offsets: number[] = [];

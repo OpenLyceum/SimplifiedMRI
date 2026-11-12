@@ -2,7 +2,7 @@
  * FieldArrowsNode.ts
  *
  * PhET's 7 × 7 grid of hollow arrows showing the magnetic field: each points along the field
- * (up) with a length proportional to the total field at its position, so the gradients show
+ * with a length proportional to the total field at its position, so the gradients show
  * as arrows that lengthen across the chamber.
  */
 
@@ -53,10 +53,10 @@ export class FieldArrowsNode extends Node {
       [model.mainFieldProperty, model.horizontalGradientProperty, model.verticalGradientProperty],
       () => {
         for (const { arrow, x, y } of arrows) {
-          const field = Math.max(0, model.fieldAt(x, y));
+          const field = model.fieldAt(x, y);
           const length = (maxLength * field) / maxField;
           const center = modelViewTransform.modelToViewXY(x, y);
-          arrow.visible = length > 1;
+          arrow.visible = Math.abs(length) > 1;
           arrow.setTailAndTip(center.x, center.y + length / 2, center.x, center.y - length / 2);
         }
       },

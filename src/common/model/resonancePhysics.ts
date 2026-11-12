@@ -16,14 +16,14 @@ const PLANCK = 6.62607015e-34;
 const BOLTZMANN = 1.380649e-23;
 
 /**
- * Resonance (Larmor) frequency f = γB, with γ the gyromagnetic ratio over 2π.
+ * Resonance (Larmor) frequency f = γ|B|, with γ the gyromagnetic ratio over 2π.
  *
  * @param gyromagneticRatio - γ/2π (MHz/T)
  * @param field - magnetic field (T)
  * @returns frequency (MHz)
  */
 export function larmorFrequency(gyromagneticRatio: number, field: number): number {
-  return gyromagneticRatio * field;
+  return gyromagneticRatio * Math.abs(field);
 }
 
 /**

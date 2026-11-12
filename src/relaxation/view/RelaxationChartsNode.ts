@@ -7,7 +7,7 @@
  *   transverse     |Mxy|/M0, decaying with time constant T2 (window about 5 T2), and the
  *                  signal a receiver coil would pick up, Mxy oscillating at the Larmor
  *                  frequency (drawn with RELAXATION.SIGNAL_CYCLES oscillations across the
- *                  window; the real signal oscillates millions of times per millisecond)
+ *                  window; the real signal oscillates about 64,000 times per millisecond)
  *
  * A dashed marker on each chart shows T1 or T2.
  */
@@ -24,6 +24,7 @@ import type { RelaxationModel } from "../model/RelaxationModel.js";
 
 const CHART_WIDTH = 250;
 const CHART_HEIGHT = 120;
+const SIGNAL_SAMPLES_PER_CYCLE = 16;
 const Y_RANGE = new Range(-1.05, 1.05);
 
 export class RelaxationChartsNode extends VBox {
@@ -32,6 +33,7 @@ export class RelaxationChartsNode extends VBox {
   private readonly mxyPlot: LinePlot;
   private readonly signalPlot: LinePlot;
   private drawnVersion = -1;
+  private drawnSignalEnd = -1;
 
   public constructor(model: RelaxationModel) {
     const strings = StringManager.getInstance().getRelaxationStrings();
@@ -138,26 +140,38 @@ export class RelaxationChartsNode extends VBox {
 
   /** Redraws the curves if the recorded samples changed; called each frame. */
   public update(): void {
-    if (this.drawnVersion === this.model.samplesVersion) {
+    const shortWindow = this.model.transverseWindowProperty.value;
+    const signalEnd = Math.min(this.model.tissueTime ?? -1, shortWindow);
+    if (this.drawnVersion === this.model.samplesVersion && this.drawnSignalEnd === signalEnd) {
       return;
     }
     this.drawnVersion = this.model.samplesVersion;
-    const samples = this.model.samples;
+    this.drawnSignalEnd = signalEnd;
     const longWindow = this.model.longitudinalWindowProperty.value;
-    const shortWindow = this.model.transverseWindowProperty.value;
-    const omega = (2 * Math.PI * RELAXATION.SIGNAL_CYCLES) / shortWindow;
 
     const mz: Vector2[] = [];
     const mxy: Vector2[] = [];
-    const signal: Vector2[] = [];
-    for (const sample of samples) {
+    for (const sample of this.model.samples) {
       if (sample.t <= longWindow) {
         mz.push(new Vector2(sample.t, sample.mz));
       }
       if (sample.t <= shortWindow) {
         mxy.push(new Vector2(sample.t, sample.mxy));
-        signal.push(new Vector2(sample.t, sample.mxy * Math.cos(omega * sample.t)));
       }
+    }
+    // Resolve the display carrier on a fixed grid even when tissue time advances by
+    // more than one carrier period in a frame.
+    const signal: Vector2[] = [];
+    if (signalEnd >= 0) {
+      const omega = (2 * Math.PI * RELAXATION.SIGNAL_CYCLES) / shortWindow;
+      const spacing = shortWindow / (RELAXATION.SIGNAL_CYCLES * SIGNAL_SAMPLES_PER_CYCLE);
+      const t2 = this.model.t2Property.value;
+      const amplitude = this.model.pulseTransverse;
+      const point = (t: number): Vector2 => new Vector2(t, amplitude * Math.exp(-t / t2) * Math.cos(omega * t));
+      for (let i = 0; i * spacing < signalEnd; i++) {
+        signal.push(point(i * spacing));
+      }
+      signal.push(point(signalEnd));
     }
     this.mzPlot.setDataSet(mz);
     this.mxyPlot.setDataSet(mxy);

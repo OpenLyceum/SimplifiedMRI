@@ -66,7 +66,7 @@
     "applyPulse": "Appliquer l’impulsion",
     "equilibrium": "Retour à l’équilibre",
     "rotatingFrame": "Référentiel tournant",
-    "isochromats": "Spins individuels",
+    "isochromats": "Spins illustratifs",
     "signal": "Signal",
     "longitudinalTitle": "Aimantation longitudinale",
     "transverseTitle": "Aimantation transversale",
@@ -147,7 +147,7 @@
       "equilibriumHelp": "Remet l’aimantation dans le sens du champ et efface les graphiques.",
       "rotatingFrame": "Référentiel tournant",
       "rotatingFrameHelp": "Vue depuis un référentiel qui tourne avec la précession, de sorte que la flèche cesse de tourner.",
-      "isochromats": "Afficher les spins individuels",
+      "isochromats": "Afficher les spins illustratifs",
       "signal": "Afficher le signal",
       "pulseApplied": "Impulsion appliquée."
     }

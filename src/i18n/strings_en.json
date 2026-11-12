@@ -66,7 +66,7 @@
     "applyPulse": "Apply pulse",
     "equilibrium": "Back to equilibrium",
     "rotatingFrame": "Rotating frame",
-    "isochromats": "Individual spins",
+    "isochromats": "Illustrative spins",
     "signal": "Signal",
     "longitudinalTitle": "Longitudinal magnetization",
     "transverseTitle": "Transverse magnetization",
@@ -147,7 +147,7 @@
       "equilibriumHelp": "Puts the magnetization back along the field and clears the graphs.",
       "rotatingFrame": "Rotating frame",
       "rotatingFrameHelp": "View from a frame turning with the precession, so the arrow stops circling.",
-      "isochromats": "Show individual spins",
+      "isochromats": "Show illustrative spins",
       "signal": "Show signal",
       "pulseApplied": "Pulse applied."
     }
