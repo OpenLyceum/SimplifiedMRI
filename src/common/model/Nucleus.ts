@@ -16,7 +16,7 @@ import { StringUnionProperty } from "scenerystack/axon";
 import type { Random, Vector2 } from "scenerystack/dot";
 import { NUCLEUS } from "../../SimplifiedMRIConstants.js";
 
-export const SpinStateValues = ["aligned", "antiAligned"] as const;
+const SpinStateValues = ["aligned", "antiAligned"] as const;
 export type SpinState = (typeof SpinStateValues)[number];
 
 export class Nucleus {

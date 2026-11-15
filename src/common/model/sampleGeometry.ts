@@ -82,7 +82,7 @@ export function nmrGridSpecs(count = SAMPLE.NMR_NUCLEUS_COUNT): NucleusSpec[] {
 }
 
 /** True if the point is inside the ellipse. */
-export function ellipseContains(ellipse: Ellipse, x: number, y: number): boolean {
+function ellipseContains(ellipse: Ellipse, x: number, y: number): boolean {
   const u = (x - ellipse.centerX) / ellipse.radiusX;
   const v = (y - ellipse.centerY) / ellipse.radiusY;
   return u * u + v * v < 1;
@@ -92,7 +92,7 @@ export function ellipseContains(ellipse: Ellipse, x: number, y: number): boolean
  * Grid points inside an ellipse, centred on it and spaced `spacing` apart, keeping only
  * points at least half a capture radius inside the edge (PhET's "working bounds").
  */
-export function ellipseGridPositions(ellipse: Ellipse, spacing: number): Vector2[] {
+function ellipseGridPositions(ellipse: Ellipse, spacing: number): Vector2[] {
   const inset = RESONANCE.CAPTURE_RADIUS / 2;
   const working: Ellipse = {
     centerX: ellipse.centerX,

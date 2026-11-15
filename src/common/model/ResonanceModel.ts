@@ -40,7 +40,7 @@ import { NucleusType } from "./NucleusType.js";
 import { Photon } from "./Photon.js";
 import { absorptionProbability, larmorFrequency, lineStrength, targetAlignedCount } from "./resonancePhysics.js";
 
-export const RadioViewValues = ["wave", "photon"] as const;
+const RadioViewValues = ["wave", "photon"] as const;
 export type RadioView = (typeof RadioViewValues)[number];
 
 /** A nucleus to create: position (cm), initial spin state, and whether it belongs to a tumour. */
