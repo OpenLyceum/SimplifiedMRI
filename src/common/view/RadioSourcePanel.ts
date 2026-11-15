@@ -11,11 +11,9 @@ import { HBox, Text, VBox } from "scenerystack/scenery";
 import { Panel } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { FONTS, PANEL_CORNER_RADIUS, RADIO } from "../../SimplifiedMRIConstants.js";
+import { FONTS, PANEL_CORNER_RADIUS, RADIO, RADIO_CONTROLS, READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 import type { RadioView, ResonanceModel } from "../model/ResonanceModel.js";
 import { createNumberControl, createRadioButtonGroup } from "./controlHelpers.js";
-
-const SLIDER_CONTROL_WIDTH = 170;
 
 export class RadioSourcePanel extends Panel {
   public constructor(model: ResonanceModel, snapToResonanceProperty: TReadOnlyProperty<boolean>) {
@@ -27,10 +25,10 @@ export class RadioSourcePanel extends Panel {
       valuePatternProperty: strings.percentPatternStringProperty,
       accessibleName: a11y.powerStringProperty,
       accessibleHelpText: a11y.powerHelpStringProperty,
-      decimalPlaces: 0,
-      delta: 1,
-      width: SLIDER_CONTROL_WIDTH,
-      majorTicks: [0, 50, 100].map((value) => ({ value, label: `${value}` })),
+      decimalPlaces: READOUT_PRECISION.POWER,
+      delta: RADIO_CONTROLS.POWER_DELTA,
+      width: RADIO_CONTROLS.SLIDER_WIDTH,
+      majorTicks: RADIO_CONTROLS.POWER_TICKS.map((value) => ({ value, label: `${value}` })),
     });
 
     const frequencyControl = createNumberControl(model.frequencyProperty, RADIO.FREQUENCY_RANGE, {
@@ -38,10 +36,10 @@ export class RadioSourcePanel extends Panel {
       valuePatternProperty: strings.megahertzPatternStringProperty,
       accessibleName: a11y.frequencyStringProperty,
       accessibleHelpText: a11y.frequencyHelpStringProperty,
-      decimalPlaces: 1,
-      delta: 0.1,
-      width: SLIDER_CONTROL_WIDTH,
-      majorTicks: [1, 40, 80, 130].map((value) => ({ value, label: `${value}` })),
+      decimalPlaces: READOUT_PRECISION.FREQUENCY,
+      delta: RADIO_CONTROLS.FREQUENCY_DELTA,
+      width: RADIO_CONTROLS.SLIDER_WIDTH,
+      majorTicks: RADIO_CONTROLS.FREQUENCY_TICKS.map((value) => ({ value, label: `${value}` })),
       endDrag: () => {
         if (snapToResonanceProperty.value) {
           model.snapFrequency();
@@ -62,28 +60,32 @@ export class RadioSourcePanel extends Panel {
       {
         accessibleName: a11y.radioViewStringProperty,
         accessibleHelpText: a11y.radioViewHelpStringProperty,
-        width: 130,
+        width: RADIO_CONTROLS.VIEW_RADIO_WIDTH,
       },
     );
 
     const title = new Text(strings.radioSourceStringProperty, {
       font: FONTS.PANEL_TITLE,
       fill: SimplifiedMRIColors.textColorProperty,
-      maxWidth: 120,
+      maxWidth: RADIO_CONTROLS.VIEW_LABEL_WIDTH,
     });
 
     super(
       new HBox({
-        spacing: 10,
+        spacing: RADIO_CONTROLS.SPACING,
         align: "center",
-        children: [powerControl, new VBox({ spacing: 10, children: [title, viewRadio] }), frequencyControl],
+        children: [
+          powerControl,
+          new VBox({ spacing: RADIO_CONTROLS.SPACING, children: [title, viewRadio] }),
+          frequencyControl,
+        ],
       }),
       {
         fill: SimplifiedMRIColors.sourceFillColorProperty,
         stroke: SimplifiedMRIColors.panelBorderColorProperty,
         cornerRadius: PANEL_CORNER_RADIUS,
-        xMargin: 10,
-        yMargin: 8,
+        xMargin: RADIO_CONTROLS.X_MARGIN,
+        yMargin: RADIO_CONTROLS.Y_MARGIN,
       },
     );
   }

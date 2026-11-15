@@ -29,7 +29,7 @@ import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { Node } from "scenerystack/scenery";
 import { Panel, type PanelOptions } from "scenerystack/sun";
 import SimplifiedMRIColors from "../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, PANEL_CORNER_RADIUS } from "../SimplifiedMRIConstants.js";
+import { CONTROL_WIDTH, PANEL, PANEL_CORNER_RADIUS } from "../SimplifiedMRIConstants.js";
 
 export type SimplifiedMRIPanelOptions = PanelOptions;
 
@@ -40,11 +40,11 @@ export class SimplifiedMRIPanel extends Panel {
         fill: SimplifiedMRIColors.panelBackgroundColorProperty,
         stroke: SimplifiedMRIColors.panelBorderColorProperty,
         cornerRadius: PANEL_CORNER_RADIUS,
-        xMargin: 12,
-        yMargin: 10,
+        xMargin: PANEL.X_MARGIN,
+        yMargin: PANEL.Y_MARGIN,
 
         // Panels in a column share a width: the control width plus margins.
-        minWidth: CONTROL_WIDTH + 24,
+        minWidth: CONTROL_WIDTH + PANEL.CONTENT_WIDTH_INSET,
       },
       providedOptions,
     );

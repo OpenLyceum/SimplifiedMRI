@@ -19,7 +19,7 @@ import { MainMagnetPanel } from "../../common/view/MainMagnetPanel.js";
 import { ResonanceScreenView } from "../../common/view/ResonanceScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, FONTS, RESONANCE } from "../../SimplifiedMRIConstants.js";
+import { CONTROL_WIDTH, FONTS, NMR_LAYOUT, RESONANCE } from "../../SimplifiedMRIConstants.js";
 import type { NMRModel } from "../model/NMRModel.js";
 import { EnergyLevelDiagram } from "./EnergyLevelDiagram.js";
 import { NMRScreenSummaryContent } from "./NMRScreenSummaryContent.js";
@@ -53,7 +53,7 @@ export class NMRScreenView extends ResonanceScreenView {
         new Text(strings.nuclei[`${type.key}StringProperty` as keyof typeof strings.nuclei], {
           font: FONTS.CONTROL_LABEL,
           fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
-          maxWidth: CONTROL_WIDTH - 60,
+          maxWidth: CONTROL_WIDTH - NMR_LAYOUT.COMBO_TEXT_INSET,
         }),
       accessibleName: strings.nuclei[`${type.key}StringProperty` as keyof typeof strings.nuclei],
     }));
@@ -64,7 +64,7 @@ export class NMRScreenView extends ResonanceScreenView {
     });
     const nucleusPanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 6,
+        spacing: NMR_LAYOUT.PANEL_SPACING,
         align: "left",
         children: [createPanelTitle(strings.sampleNucleusStringProperty), nucleusComboBox],
       }),
@@ -82,7 +82,7 @@ export class NMRScreenView extends ResonanceScreenView {
     );
     const showPanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 6,
+        spacing: NMR_LAYOUT.PANEL_SPACING,
         align: "left",
         children: [createPanelTitle(strings.showStringProperty), fieldCheckbox, precessionCheckbox],
       }),

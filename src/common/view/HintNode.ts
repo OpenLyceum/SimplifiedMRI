@@ -9,10 +9,7 @@ import type { TReadOnlyProperty } from "scenerystack/axon";
 import { Shape } from "scenerystack/kite";
 import { Node, Path, Text } from "scenerystack/scenery";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { FONTS } from "../../SimplifiedMRIConstants.js";
-
-const PADDING = 8;
-const POINTER = 14;
+import { FONTS, HINT } from "../../SimplifiedMRIConstants.js";
 
 export class HintNode extends Node {
   public constructor(textProperty: TReadOnlyProperty<string>, visibleProperty: TReadOnlyProperty<boolean>) {
@@ -20,33 +17,33 @@ export class HintNode extends Node {
     const text = new Text(textProperty, {
       font: FONTS.HINT,
       fill: SimplifiedMRIColors.hintTextColorProperty,
-      maxWidth: 260,
+      maxWidth: HINT.MAX_TEXT_WIDTH,
     });
     const bubble = new Path(null, {
       fill: SimplifiedMRIColors.hintFillColorProperty,
       stroke: SimplifiedMRIColors.hintTextColorProperty,
-      lineWidth: 1,
+      lineWidth: HINT.LINE_WIDTH,
     });
     this.children = [bubble, text];
 
     text.boundsProperty.link((bounds) => {
-      const width = bounds.width + 2 * PADDING;
-      const height = bounds.height + 2 * PADDING;
+      const width = bounds.width + 2 * HINT.PADDING;
+      const height = bounds.height + 2 * HINT.PADDING;
       bubble.shape = new Shape()
-        .roundRect(0, 0, width, height, 8, 8)
-        .moveTo(width * 0.25 - POINTER / 2, height)
-        .lineTo(width * 0.25, height + POINTER)
-        .lineTo(width * 0.25 + POINTER / 2, height)
+        .roundRect(0, 0, width, height, HINT.CORNER_RADIUS, HINT.CORNER_RADIUS)
+        .moveTo(width * HINT.POINTER_X_FRACTION - HINT.POINTER_LENGTH / 2, height)
+        .lineTo(width * HINT.POINTER_X_FRACTION, height + HINT.POINTER_LENGTH)
+        .lineTo(width * HINT.POINTER_X_FRACTION + HINT.POINTER_LENGTH / 2, height)
         .close();
-      text.left = PADDING;
-      text.top = PADDING;
+      text.left = HINT.PADDING;
+      text.top = HINT.PADDING;
     });
   }
 
   /** Point (in parent coordinates) the bubble's pointer should touch. */
   public setPointerTip(x: number, y: number): void {
     const bubbleBounds = this.localBounds;
-    this.x = x - bubbleBounds.width * 0.25;
+    this.x = x - bubbleBounds.width * HINT.POINTER_X_FRACTION;
     this.y = y - bubbleBounds.height;
   }
 }

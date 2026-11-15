@@ -5,11 +5,11 @@
  */
 
 import { RichText, Text, VBox } from "scenerystack/scenery";
-import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../i18n/StringManager.js";
 import SimplifiedMRIColors from "../SimplifiedMRIColors.js";
+import { FONTS, PREFERENCES_LAYOUT } from "../SimplifiedMRIConstants.js";
 import SimplifiedMRINamespace from "../SimplifiedMRINamespace.js";
 import type { SimplifiedMRIPreferencesModel } from "./SimplifiedMRIPreferencesModel.js";
 
@@ -18,34 +18,34 @@ export class SimplifiedMRIPreferencesNode extends VBox {
     const prefStrings = StringManager.getInstance().getPreferences();
 
     const header = new Text(prefStrings.titleStringProperty, {
-      font: new PhetFont({ size: 18, weight: "bold" }),
+      font: FONTS.PREFERENCES_TITLE,
       fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
     });
 
     const snapCheckbox = new Checkbox(
       preferencesModel.snapToResonanceProperty,
       new Text(prefStrings.snapToResonanceStringProperty, {
-        font: new PhetFont(16),
+        font: FONTS.PREFERENCES_LABEL,
         fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
       }),
       {
         checkboxColor: SimplifiedMRIColors.controlSurfaceTextColorProperty,
         checkboxColorBackground: SimplifiedMRIColors.controlSurfaceColorProperty,
-        spacing: 8,
+        spacing: PREFERENCES_LAYOUT.CONTROL_SPACING,
         accessibleHelpText: prefStrings.snapToResonanceDescriptionStringProperty,
         ...(tandem && { tandem: tandem.createTandem("snapToResonanceCheckbox") }),
       },
     );
 
     const description = new RichText(prefStrings.snapToResonanceDescriptionStringProperty, {
-      font: new PhetFont(14),
+      font: FONTS.PREFERENCES_DESCRIPTION,
       fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
-      lineWrap: 520,
+      lineWrap: PREFERENCES_LAYOUT.DESCRIPTION_WIDTH,
     });
 
     super({
       align: "left",
-      spacing: 12,
+      spacing: PREFERENCES_LAYOUT.SECTION_SPACING,
       children: [header, snapCheckbox, description],
     });
   }

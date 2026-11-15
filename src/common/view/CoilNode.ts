@@ -15,6 +15,7 @@ import type { TReadOnlyProperty } from "scenerystack/axon";
 import { Shape } from "scenerystack/kite";
 import { Node, type NodeOptions, Path, Rectangle } from "scenerystack/scenery";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
+import { COIL } from "../../SimplifiedMRIConstants.js";
 
 export type CoilOrientation = "horizontal" | "vertical";
 
@@ -41,7 +42,7 @@ export class CoilNode extends Node {
     strengthProperty: TReadOnlyProperty<number>,
     providedOptions?: CoilNodeOptions,
   ) {
-    const { segments = 1, loops = 4, ...nodeOptions } = providedOptions ?? {};
+    const { segments = 1, loops = COIL.DEFAULT_LOOPS, ...nodeOptions } = providedOptions ?? {};
     super();
 
     const isGradient = segments > 1;
@@ -54,29 +55,38 @@ export class CoilNode extends Node {
       for (let k = 0; k < loops; k++) {
         // Each loop is a flat ellipse across the coil.
         const offset = ((k + 0.5) / loops) * thickness;
-        const rx = segmentLength / 2 - 1;
-        const ry = Math.max(1.5, thickness / loops / 2);
+        const rx = segmentLength / 2 - COIL.END_INSET;
+        const ry = Math.max(COIL.MIN_LOOP_RADIUS, thickness / loops / 2);
         if (orientation === "horizontal") {
           coil.ellipse(start + segmentLength / 2, offset, rx, ry, 0);
-          highlight.moveTo(start + 3, offset - ry * 0.4).lineTo(start + segmentLength - 3, offset - ry * 0.4);
+          highlight
+            .moveTo(start + COIL.HIGHLIGHT_INSET, offset - ry * COIL.HIGHLIGHT_OFFSET_FACTOR)
+            .lineTo(start + segmentLength - COIL.HIGHLIGHT_INSET, offset - ry * COIL.HIGHLIGHT_OFFSET_FACTOR);
         } else {
           coil.ellipse(offset, start + segmentLength / 2, ry, rx, 0);
-          highlight.moveTo(offset - ry * 0.4, start + 3).lineTo(offset - ry * 0.4, start + segmentLength - 3);
+          highlight
+            .moveTo(offset - ry * COIL.HIGHLIGHT_OFFSET_FACTOR, start + COIL.HIGHLIGHT_INSET)
+            .lineTo(offset - ry * COIL.HIGHLIGHT_OFFSET_FACTOR, start + segmentLength - COIL.HIGHLIGHT_INSET);
         }
       }
       this.addChild(
         new Path(coil, {
           fill: SimplifiedMRIColors.coilShadowColorProperty,
           stroke: isGradient ? SimplifiedMRIColors.gradientCoilColorProperty : SimplifiedMRIColors.coilColorProperty,
-          lineWidth: 2,
+          lineWidth: COIL.LINE_WIDTH,
         }),
       );
-      this.addChild(new Path(highlight, { stroke: SimplifiedMRIColors.coilHighlightColorProperty, lineWidth: 0.8 }));
+      this.addChild(
+        new Path(highlight, {
+          stroke: SimplifiedMRIColors.coilHighlightColorProperty,
+          lineWidth: COIL.HIGHLIGHT_LINE_WIDTH,
+        }),
+      );
 
       const glow =
         orientation === "horizontal"
-          ? new Rectangle(start, 0, segmentLength, thickness, { cornerRadius: thickness / 3 })
-          : new Rectangle(0, start, thickness, segmentLength, { cornerRadius: thickness / 3 });
+          ? new Rectangle(start, 0, segmentLength, thickness, { cornerRadius: thickness / COIL.CORNER_RADIUS_DIVISOR })
+          : new Rectangle(0, start, thickness, segmentLength, { cornerRadius: thickness / COIL.CORNER_RADIUS_DIVISOR });
       glow.fill = SimplifiedMRIColors.coilHighlightColorProperty;
       glow.pickable = false;
       glows.push(glow);
@@ -88,7 +98,7 @@ export class CoilNode extends Node {
         // Horizontal gradients increase to the right; vertical ones upward (y is down here).
         const position = (s + 0.5) / segments;
         const weight = isGradient ? (orientation === "horizontal" ? position : 1 - position) : 1;
-        glow.opacity = 0.55 * strength * weight;
+        glow.opacity = COIL.MAX_GLOW_OPACITY * strength * weight;
       });
     });
 

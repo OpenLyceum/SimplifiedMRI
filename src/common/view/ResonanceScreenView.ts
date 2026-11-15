@@ -21,7 +21,7 @@ import { ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CHAMBER, DETECTOR, MAGNET, SCREEN_VIEW_MARGIN } from "../../SimplifiedMRIConstants.js";
+import { CHAMBER, DETECTOR, MAGNET, RESONANCE_LAYOUT, SCREEN_VIEW_MARGIN } from "../../SimplifiedMRIConstants.js";
 import type { ResonanceModel } from "../model/ResonanceModel.js";
 import { FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS, FLAT_RESET_ALL_BUTTON_OPTIONS } from "../SimplifiedMRIButtonOptions.js";
 import { CoilNode } from "./CoilNode.js";
@@ -30,21 +30,6 @@ import { HintNode } from "./HintNode.js";
 import { NucleiLayer } from "./NucleiLayer.js";
 import { RadioSourcePanel } from "./RadioSourcePanel.js";
 import { RadioWavesNode } from "./RadioWavesNode.js";
-
-/** Vertical layout of the magnet assembly (view px). */
-export const LAYOUT = {
-  TOP: 14,
-  MAIN_COIL_THICKNESS: 22,
-  GRADIENT_COIL_THICKNESS: 16,
-  GAP: 3,
-
-  /** Left edge of the chamber, leaving room for the vertical gradient coil. */
-  CHAMBER_LEFT: 52,
-  VERTICAL_COIL_LEFT: 22,
-
-  /** Left edge of the right-hand column of panels. */
-  RIGHT_COLUMN_LEFT: 600,
-} as const;
 
 export abstract class ResonanceScreenView extends ScreenView {
   protected readonly model: ResonanceModel;
@@ -78,9 +63,9 @@ export abstract class ResonanceScreenView extends ScreenView {
     this.model = model;
     const bounds = this.layoutBounds;
 
-    const chamberTop = bounds.minY + LAYOUT.TOP + LAYOUT.MAIN_COIL_THICKNESS + LAYOUT.GAP;
+    const chamberTop = bounds.minY + RESONANCE_LAYOUT.TOP + RESONANCE_LAYOUT.MAIN_COIL_THICKNESS + RESONANCE_LAYOUT.GAP;
     const chamberHeight = CHAMBER.HEIGHT * CHAMBER.VIEW_SCALE;
-    const chamberLeft = bounds.minX + LAYOUT.CHAMBER_LEFT;
+    const chamberLeft = bounds.minX + RESONANCE_LAYOUT.CHAMBER_LEFT;
     this.modelViewTransform = ModelViewTransform2.createSinglePointScaleInvertedYMapping(
       Vector2.ZERO,
       new Vector2(chamberLeft, chamberTop + chamberHeight),
@@ -96,15 +81,27 @@ export abstract class ResonanceScreenView extends ScreenView {
       [model.mainFieldProperty],
       (field) => field / MAGNET.MAIN_FIELD_RANGE.max,
     );
-    const upperCoil = new CoilNode(chamber.width, LAYOUT.MAIN_COIL_THICKNESS, "horizontal", coilStrengthProperty, {
-      left: chamber.minX,
-      bottom: chamber.minY - LAYOUT.GAP,
-    });
-    this.gradientCoilTop = chamber.maxY + LAYOUT.GAP;
-    const lowerCoil = new CoilNode(chamber.width, LAYOUT.MAIN_COIL_THICKNESS, "horizontal", coilStrengthProperty, {
-      left: chamber.minX,
-      top: this.gradientCoilTop + LAYOUT.GRADIENT_COIL_THICKNESS + LAYOUT.GAP,
-    });
+    const upperCoil = new CoilNode(
+      chamber.width,
+      RESONANCE_LAYOUT.MAIN_COIL_THICKNESS,
+      "horizontal",
+      coilStrengthProperty,
+      {
+        left: chamber.minX,
+        bottom: chamber.minY - RESONANCE_LAYOUT.GAP,
+      },
+    );
+    this.gradientCoilTop = chamber.maxY + RESONANCE_LAYOUT.GAP;
+    const lowerCoil = new CoilNode(
+      chamber.width,
+      RESONANCE_LAYOUT.MAIN_COIL_THICKNESS,
+      "horizontal",
+      coilStrengthProperty,
+      {
+        left: chamber.minX,
+        top: this.gradientCoilTop + RESONANCE_LAYOUT.GRADIENT_COIL_THICKNESS + RESONANCE_LAYOUT.GAP,
+      },
+    );
 
     const chamberRectangle = Rectangle.bounds(chamber, {
       fill: SimplifiedMRIColors.chamberFillColorProperty,
@@ -120,13 +117,16 @@ export abstract class ResonanceScreenView extends ScreenView {
     // ── Radio-wave source ───────────────────────────────────────────────────────
     this.radioSourcePanel = new RadioSourcePanel(model, snapToResonanceProperty);
     this.radioSourcePanel.left = bounds.minX + SCREEN_VIEW_MARGIN;
-    this.radioSourcePanel.top = lowerCoil.bottom + 8;
+    this.radioSourcePanel.top = lowerCoil.bottom + RESONANCE_LAYOUT.PANEL_SPACING;
 
     const hint = new HintNode(
       StringManager.getInstance().getCommonStrings().hintStringProperty,
       model.hintVisibleProperty,
     );
-    hint.setPointerTip(this.radioSourcePanel.left + 110, this.radioSourcePanel.top + 4);
+    hint.setPointerTip(
+      this.radioSourcePanel.left + RESONANCE_LAYOUT.HINT_X_OFFSET,
+      this.radioSourcePanel.top + RESONANCE_LAYOUT.HINT_Y_OFFSET,
+    );
 
     // ── Time controls and Reset All ─────────────────────────────────────────────
     this.timeControlNode = new TimeControlNode(model.timer.isPlayingProperty, {
@@ -148,7 +148,7 @@ export abstract class ResonanceScreenView extends ScreenView {
       right: bounds.maxX - SCREEN_VIEW_MARGIN,
       bottom: bounds.maxY - SCREEN_VIEW_MARGIN,
     });
-    this.timeControlNode.right = this.resetAllButton.left - 30;
+    this.timeControlNode.right = this.resetAllButton.left - RESONANCE_LAYOUT.TIME_CONTROL_GAP;
     this.timeControlNode.centerY = this.resetAllButton.centerY;
 
     this.children = [
@@ -170,12 +170,12 @@ export abstract class ResonanceScreenView extends ScreenView {
   /** Stacks the subclass's panels in the right-hand column. */
   protected layoutRightColumn(panels: readonly Node[]): VBox {
     const column = new VBox({
-      spacing: 8,
+      spacing: RESONANCE_LAYOUT.PANEL_SPACING,
       align: "left",
       stretch: true,
       children: [...panels],
-      left: this.layoutBounds.minX + LAYOUT.RIGHT_COLUMN_LEFT,
-      top: this.layoutBounds.minY + LAYOUT.TOP,
+      left: this.layoutBounds.minX + RESONANCE_LAYOUT.RIGHT_COLUMN_LEFT,
+      top: this.layoutBounds.minY + RESONANCE_LAYOUT.TOP,
     });
     this.addChild(column);
     return column;

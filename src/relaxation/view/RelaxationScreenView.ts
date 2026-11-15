@@ -34,7 +34,14 @@ import {
 } from "../../common/view/controlHelpers.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, FONTS, RELAXATION, SCREEN_VIEW_MARGIN } from "../../SimplifiedMRIConstants.js";
+import {
+  CONTROL_WIDTH,
+  FONTS,
+  READOUT_PRECISION,
+  RELAXATION,
+  RELAXATION_LAYOUT,
+  SCREEN_VIEW_MARGIN,
+} from "../../SimplifiedMRIConstants.js";
 import type { RelaxationModel } from "../model/RelaxationModel.js";
 import { Tissue } from "../model/Tissue.js";
 import { BlochSphereNode } from "./BlochSphereNode.js";
@@ -43,8 +50,6 @@ import { RelaxationChartsNode } from "./RelaxationChartsNode.js";
 import { RelaxationScreenSummaryContent } from "./RelaxationScreenSummaryContent.js";
 
 export type RelaxationScreenViewOptions = ScreenViewOptions;
-
-const SPHERE_RADIUS = 125;
 
 export class RelaxationScreenView extends ScreenView {
   private readonly sphere: BlochSphereNode;
@@ -62,44 +67,69 @@ export class RelaxationScreenView extends ScreenView {
     const a11y = sm.getRelaxationA11yStrings();
 
     // ── Sphere and its notes ────────────────────────────────────────────────────
-    this.sphere = new BlochSphereNode(model, SPHERE_RADIUS);
-    this.sphere.x = bounds.minX + SCREEN_VIEW_MARGIN + SPHERE_RADIUS * 1.25;
-    this.sphere.y = bounds.minY + SCREEN_VIEW_MARGIN + SPHERE_RADIUS * 1.6;
+    this.sphere = new BlochSphereNode(model, RELAXATION_LAYOUT.SPHERE_RADIUS);
+    this.sphere.x =
+      bounds.minX + SCREEN_VIEW_MARGIN + RELAXATION_LAYOUT.SPHERE_RADIUS * RELAXATION_LAYOUT.SPHERE_X_FACTOR;
+    this.sphere.y =
+      bounds.minY + SCREEN_VIEW_MARGIN + RELAXATION_LAYOUT.SPHERE_RADIUS * RELAXATION_LAYOUT.SPHERE_Y_FACTOR;
 
     const readout = new RichText(
       new DerivedProperty(
         [strings.readoutPatternStringProperty, model.mzProperty, model.mxyProperty],
-        (pattern, mz, mxy) => StringUtils.fillIn(pattern, { mz: toFixed(mz, 2), mxy: toFixed(mxy, 2) }),
+        (pattern, mz, mxy) =>
+          StringUtils.fillIn(pattern, {
+            mz: toFixed(mz, READOUT_PRECISION.MAGNETIZATION),
+            mxy: toFixed(mxy, READOUT_PRECISION.MAGNETIZATION),
+          }),
       ),
-      { font: FONTS.READOUT_VALUE, fill: SimplifiedMRIColors.textColorProperty, maxWidth: 2.4 * SPHERE_RADIUS },
+      {
+        font: FONTS.READOUT_VALUE,
+        fill: SimplifiedMRIColors.textColorProperty,
+        maxWidth: RELAXATION_LAYOUT.NOTE_WIDTH_FACTOR * RELAXATION_LAYOUT.SPHERE_RADIUS,
+      },
     );
     const larmor = new Text(
       new DerivedProperty([strings.larmorPatternStringProperty], (pattern) =>
         StringUtils.fillIn(pattern, {
-          field: toFixed(RELAXATION.FIELD, 1),
-          frequency: toFixed(larmorFrequency(NucleusType.HYDROGEN_1.gyromagneticRatio, RELAXATION.FIELD), 1),
+          field: toFixed(RELAXATION.FIELD, READOUT_PRECISION.RELAXATION_FIELD),
+          frequency: toFixed(
+            larmorFrequency(NucleusType.HYDROGEN_1.gyromagneticRatio, RELAXATION.FIELD),
+            READOUT_PRECISION.FREQUENCY,
+          ),
         }),
       ),
-      { font: FONTS.READOUT, fill: SimplifiedMRIColors.secondaryTextColorProperty, maxWidth: 2.4 * SPHERE_RADIUS },
+      {
+        font: FONTS.READOUT,
+        fill: SimplifiedMRIColors.secondaryTextColorProperty,
+        maxWidth: RELAXATION_LAYOUT.NOTE_WIDTH_FACTOR * RELAXATION_LAYOUT.SPHERE_RADIUS,
+      },
     );
     const precessionNote = new Text(strings.precessionNoteStringProperty, {
       font: FONTS.SMALL,
       fill: SimplifiedMRIColors.secondaryTextColorProperty,
-      maxWidth: 2.4 * SPHERE_RADIUS,
+      maxWidth: RELAXATION_LAYOUT.NOTE_WIDTH_FACTOR * RELAXATION_LAYOUT.SPHERE_RADIUS,
       visibleProperty: DerivedProperty.not(model.rotatingFrameProperty),
     });
     const pulseHint = new Text(strings.pulseHintStringProperty, {
       font: FONTS.HINT,
       fill: SimplifiedMRIColors.accentColorProperty,
-      maxWidth: 2.4 * SPHERE_RADIUS,
+      maxWidth: RELAXATION_LAYOUT.NOTE_WIDTH_FACTOR * RELAXATION_LAYOUT.SPHERE_RADIUS,
     });
-    const notes = new VBox({ spacing: 4, align: "left", children: [readout, larmor, precessionNote, pulseHint] });
+    const notes = new VBox({
+      spacing: RELAXATION_LAYOUT.NOTE_SPACING,
+      align: "left",
+      children: [readout, larmor, precessionNote, pulseHint],
+    });
     notes.left = bounds.minX + SCREEN_VIEW_MARGIN;
-    notes.top = this.sphere.y + SPHERE_RADIUS * 1.15 + 14;
+    notes.top =
+      this.sphere.y + RELAXATION_LAYOUT.SPHERE_RADIUS * RELAXATION_LAYOUT.NOTE_Y_FACTOR + RELAXATION_LAYOUT.TOP_GAP;
 
     // ── Charts ──────────────────────────────────────────────────────────────────
     this.charts = new RelaxationChartsNode(model);
-    this.charts.left = bounds.minX + 2.6 * SPHERE_RADIUS + 70;
+    this.charts.left =
+      bounds.minX +
+      RELAXATION_LAYOUT.CHART_X_FACTOR * RELAXATION_LAYOUT.SPHERE_RADIUS +
+      RELAXATION_LAYOUT.CHART_X_OFFSET;
     this.charts.top = bounds.minY + SCREEN_VIEW_MARGIN;
 
     // ── Tissue panel ────────────────────────────────────────────────────────────
@@ -112,7 +142,7 @@ export class RelaxationScreenView extends ScreenView {
           new Text(name, {
             font: FONTS.CONTROL_LABEL,
             fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
-            maxWidth: CONTROL_WIDTH - 60,
+            maxWidth: CONTROL_WIDTH - RELAXATION_LAYOUT.COMBO_TEXT_INSET,
           }),
         accessibleName: name,
       };
@@ -136,7 +166,7 @@ export class RelaxationScreenView extends ScreenView {
     });
     const tissuePanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 8,
+        spacing: RELAXATION_LAYOUT.PANEL_SPACING,
         align: "left",
         children: [createPanelTitle(strings.tissueStringProperty), tissueComboBox, t1Control, t2Control],
       }),
@@ -148,16 +178,16 @@ export class RelaxationScreenView extends ScreenView {
       valuePatternProperty: strings.degreesPatternStringProperty,
       accessibleName: a11y.flipAngleStringProperty,
       accessibleHelpText: a11y.flipAngleHelpStringProperty,
-      decimalPlaces: 0,
-      delta: 5,
-      majorTicks: [10, 90, 180].map((value) => ({ value, label: `${value}°` })),
+      decimalPlaces: READOUT_PRECISION.FLIP_ANGLE,
+      delta: RELAXATION_LAYOUT.FLIP_ANGLE_DELTA,
+      majorTicks: RELAXATION_LAYOUT.MAJOR_TICKS.map((value) => ({ value, label: `${value}°` })),
     });
     const notPulsingProperty = DerivedProperty.not(model.pulseActiveProperty);
     const pulseButton = createPushButton(strings.applyPulseStringProperty, {
       accessibleName: a11y.applyPulseStringProperty,
       accessibleHelpText: a11y.applyPulseHelpStringProperty,
       enabledProperty: notPulsingProperty,
-      maxTextWidth: CONTROL_WIDTH / 2 - 24,
+      maxTextWidth: CONTROL_WIDTH / 2 - RELAXATION_LAYOUT.BUTTON_TEXT_INSET,
       listener: () => {
         model.applyPulse();
         this.addAccessibleResponse(a11y.pulseAppliedStringProperty);
@@ -166,7 +196,7 @@ export class RelaxationScreenView extends ScreenView {
     const equilibriumButton = createPushButton(strings.equilibriumStringProperty, {
       accessibleName: a11y.equilibriumStringProperty,
       accessibleHelpText: a11y.equilibriumHelpStringProperty,
-      maxTextWidth: CONTROL_WIDTH / 2 - 24,
+      maxTextWidth: CONTROL_WIDTH / 2 - RELAXATION_LAYOUT.BUTTON_TEXT_INSET,
       listener: () => {
         model.returnToEquilibrium();
         this.sphere.clearTrail();
@@ -174,12 +204,12 @@ export class RelaxationScreenView extends ScreenView {
     });
     const pulsePanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 8,
+        spacing: RELAXATION_LAYOUT.PANEL_SPACING,
         align: "left",
         children: [
           createPanelTitle(strings.rfPulseStringProperty),
           flipAngleControl,
-          new HBox({ spacing: 8, children: [pulseButton, equilibriumButton] }),
+          new HBox({ spacing: RELAXATION_LAYOUT.PANEL_SPACING, children: [pulseButton, equilibriumButton] }),
         ],
       }),
     );
@@ -193,7 +223,7 @@ export class RelaxationScreenView extends ScreenView {
     rotatingCheckbox.accessibleHelpText = a11y.rotatingFrameHelpStringProperty;
     const showPanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 6,
+        spacing: RELAXATION_LAYOUT.DISPLAY_SPACING,
         align: "left",
         children: [
           createPanelTitle(sm.getCommonStrings().showStringProperty),
@@ -209,9 +239,14 @@ export class RelaxationScreenView extends ScreenView {
     );
 
     const panels = [tissuePanel, pulsePanel, showPanel];
-    const column = new VBox({ spacing: 8, align: "left", stretch: true, children: panels });
+    const column = new VBox({
+      spacing: RELAXATION_LAYOUT.PANEL_SPACING,
+      align: "left",
+      stretch: true,
+      children: panels,
+    });
     column.right = bounds.maxX - SCREEN_VIEW_MARGIN;
-    column.top = bounds.minY + 14;
+    column.top = bounds.minY + RELAXATION_LAYOUT.TOP_GAP;
 
     // ── Time controls and Reset All ─────────────────────────────────────────────
     const timeControlNode = new TimeControlNode(model.timer.isPlayingProperty, {

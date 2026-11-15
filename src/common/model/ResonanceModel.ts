@@ -32,7 +32,7 @@ import {
 } from "scenerystack/axon";
 import { dotRandom, type Random, type Vector2 } from "scenerystack/dot";
 import type { TModel } from "scenerystack/joist";
-import { CHAMBER, DETECTOR, MAGNET, NUCLEUS, RADIO, RESONANCE, SPIN } from "../../SimplifiedMRIConstants.js";
+import { CHAMBER, DETECTOR, MAGNET, NUCLEUS, RADIO, RESONANCE, SPIN, TIME } from "../../SimplifiedMRIConstants.js";
 import { TimeModel } from "../TimeModel.js";
 import type { Detector } from "./Detector.js";
 import { Nucleus, type SpinState } from "./Nucleus.js";
@@ -42,12 +42,6 @@ import { absorptionProbability, larmorFrequency, lineStrength, targetAlignedCoun
 
 export const RadioViewValues = ["wave", "photon"] as const;
 export type RadioView = (typeof RadioViewValues)[number];
-
-/** Time advanced by one press of the step button (s). */
-export const STEP_DT = 1 / 25;
-
-/** Largest time step the model accepts (s); longer frames are clamped. */
-const MAX_DT = 0.1;
 
 /** A nucleus to create: position (cm), initial spin state, and whether it belongs to a tumour. */
 export type NucleusSpec = { position: Vector2; spinState: SpinState; isTumor?: boolean };
@@ -220,12 +214,12 @@ export class ResonanceModel implements TModel {
 
   /** Advances one step-button increment regardless of the play state. */
   public stepOnce(): void {
-    this.stepModel(STEP_DT);
+    this.stepModel(TIME.STEP_DT);
   }
 
   /** Advances the model by dt seconds. */
   public stepModel(dt: number): void {
-    const h = Math.min(dt, MAX_DT);
+    const h = Math.min(dt, TIME.MAX_DT);
     this.time += h;
     this.timer.timeProperty.value = this.time;
 
@@ -399,7 +393,9 @@ export class ResonanceModel implements TModel {
   /** Thermal flips slow down as the field grows, as in PhET. */
   private drawThermalInterval(): number {
     const field = this.mainFieldProperty.value;
-    return this.drawWait(SPIN.THERMAL_FLIP_INTERVAL * (1 + (5 * field) / MAGNET.MAIN_FIELD_RANGE.max));
+    return this.drawWait(
+      SPIN.THERMAL_FLIP_INTERVAL * (1 + (SPIN.THERMAL_FIELD_FACTOR * field) / MAGNET.MAIN_FIELD_RANGE.max),
+    );
   }
 
   protected updateAlignedCount(): void {

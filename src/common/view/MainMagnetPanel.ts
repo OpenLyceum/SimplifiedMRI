@@ -8,7 +8,7 @@
 import type { TReadOnlyProperty } from "scenerystack/axon";
 import { VBox } from "scenerystack/scenery";
 import { StringManager } from "../../i18n/StringManager.js";
-import { MAGNET } from "../../SimplifiedMRIConstants.js";
+import { MAGNET, MAIN_FIELD_CONTROL, READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 import type { ResonanceModel } from "../model/ResonanceModel.js";
 import { SimplifiedMRIPanel } from "../SimplifiedMRIPanel.js";
 import { createNumberControl, createPanelTitle } from "./controlHelpers.js";
@@ -23,9 +23,9 @@ export class MainMagnetPanel extends SimplifiedMRIPanel {
       valuePatternProperty: strings.teslaPatternStringProperty,
       accessibleName: a11y.mainFieldStringProperty,
       accessibleHelpText: a11y.mainFieldHelpStringProperty,
-      decimalPlaces: 2,
-      delta: 0.01,
-      majorTicks: [0, 1, 2, 3].map((value) => ({ value, label: `${value}` })),
+      decimalPlaces: READOUT_PRECISION.FIELD,
+      delta: MAIN_FIELD_CONTROL.DELTA,
+      majorTicks: MAIN_FIELD_CONTROL.MAJOR_TICKS.map((value) => ({ value, label: `${value}` })),
       endDrag: () => {
         if (snapToResonanceProperty.value) {
           model.snapMainField();
@@ -35,7 +35,7 @@ export class MainMagnetPanel extends SimplifiedMRIPanel {
 
     super(
       new VBox({
-        spacing: 6,
+        spacing: MAIN_FIELD_CONTROL.SPACING,
         align: "left",
         children: [createPanelTitle(strings.mainMagnetStringProperty), fieldControl],
       }),

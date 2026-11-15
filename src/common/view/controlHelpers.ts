@@ -11,7 +11,7 @@ import { type Node, RichText, Text } from "scenerystack/scenery";
 import { NumberControl } from "scenerystack/scenery-phet";
 import { Checkbox, RectangularPushButton, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, FONTS } from "../../SimplifiedMRIConstants.js";
+import { CONTROL_WIDTH, CONTROLS, FONTS } from "../../SimplifiedMRIConstants.js";
 import { FLAT_RECTANGULAR_BUTTON_OPTIONS, LIGHT_SURFACE_TEXT_FILL } from "../SimplifiedMRIButtonOptions.js";
 
 export type NumberControlConfig = {
@@ -47,12 +47,15 @@ export const createNumberControl = (
 ): NumberControl => {
   const width = config.width ?? CONTROL_WIDTH;
   return new NumberControl(config.titleProperty, property, range, {
-    layoutFunction: NumberControl.createLayoutFunction4({ sliderPadding: 4, verticalSpacing: 4 }),
+    layoutFunction: NumberControl.createLayoutFunction4({
+      sliderPadding: CONTROLS.SLIDER_PADDING,
+      verticalSpacing: CONTROLS.VERTICAL_SPACING,
+    }),
     delta: config.delta,
     titleNodeOptions: {
       font: FONTS.CONTROL_TITLE,
       fill: SimplifiedMRIColors.textColorProperty,
-      maxWidth: width - 100,
+      maxWidth: width - CONTROLS.TITLE_WIDTH_INSET,
     },
     numberDisplayOptions: {
       textOptions: {
@@ -70,13 +73,13 @@ export const createNumberControl = (
           }
         : { valuePattern: config.valuePatternProperty, decimalPlaces: config.decimalPlaces }),
     },
-    arrowButtonOptions: { ...FLAT_RECTANGULAR_BUTTON_OPTIONS, scale: 0.75 },
+    arrowButtonOptions: { ...FLAT_RECTANGULAR_BUTTON_OPTIONS, scale: CONTROLS.ARROW_BUTTON_SCALE },
     sliderOptions: {
-      trackSize: new Dimension2(width - 60, 3),
-      thumbSize: new Dimension2(12, 22),
+      trackSize: new Dimension2(width - CONTROLS.TRACK_WIDTH_INSET, CONTROLS.TRACK_HEIGHT),
+      thumbSize: CONTROLS.THUMB_SIZE,
       thumbFill: SimplifiedMRIColors.accentColorProperty,
       trackFillEnabled: SimplifiedMRIColors.textColorProperty,
-      majorTickLength: 8,
+      majorTickLength: CONTROLS.TICK_LENGTH,
       majorTickStroke: SimplifiedMRIColors.textColorProperty,
       ...(config.endDrag ? { endDrag: config.endDrag } : {}),
       ...(config.ariaValueText
@@ -108,11 +111,11 @@ export const createCheckbox = (
     new Text(labelProperty, {
       font: FONTS.CONTROL_LABEL,
       fill: SimplifiedMRIColors.textColorProperty,
-      maxWidth: width - 30,
+      maxWidth: width - CONTROLS.CHECKBOX_TEXT_INSET,
     }),
     {
-      boxWidth: 16,
-      spacing: 6,
+      boxWidth: CONTROLS.CHECKBOX_BOX_WIDTH,
+      spacing: CONTROLS.LABEL_SPACING,
       checkboxColor: SimplifiedMRIColors.textColorProperty,
       checkboxColorBackground: SimplifiedMRIColors.panelBackgroundColorProperty,
       accessibleName,
@@ -135,7 +138,7 @@ export const createPushButton = (
     content: new Text(labelProperty, {
       font: FONTS.CONTROL_LABEL,
       fill: LIGHT_SURFACE_TEXT_FILL,
-      maxWidth: config.maxTextWidth ?? CONTROL_WIDTH - 24,
+      maxWidth: config.maxTextWidth ?? CONTROL_WIDTH - CONTROLS.BUTTON_TEXT_INSET,
     }),
     baseColor: SimplifiedMRIColors.controlSurfaceColorProperty,
     ...(config.enabledProperty ? { enabledProperty: config.enabledProperty } : {}),
@@ -166,15 +169,15 @@ export const createRadioButtonGroup = <T>(
         new Text(item.labelProperty, {
           font: FONTS.CONTROL_LABEL,
           fill: SimplifiedMRIColors.textColorProperty,
-          maxWidth: (config.width ?? CONTROL_WIDTH) - 40,
+          maxWidth: (config.width ?? CONTROL_WIDTH) - CONTROLS.RADIO_TEXT_INSET,
         }),
       options: { accessibleName: item.accessibleName },
     })),
     {
-      spacing: 6,
+      spacing: CONTROLS.LABEL_SPACING,
       align: "left",
       radioButtonOptions: {
-        radius: 7,
+        radius: CONTROLS.RADIO_RADIUS,
         selectedColor: SimplifiedMRIColors.accentColorProperty,
         deselectedColor: SimplifiedMRIColors.controlSurfaceColorProperty,
         stroke: SimplifiedMRIColors.textColorProperty,

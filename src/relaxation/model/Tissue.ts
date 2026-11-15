@@ -11,14 +11,23 @@
  */
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
+import { TISSUE_TIMES } from "../../SimplifiedMRIConstants.js";
 
 export class Tissue extends EnumerationValue {
-  public static readonly FAT = new Tissue("fat", 340, 60);
-  public static readonly WHITE_MATTER = new Tissue("whiteMatter", 880, 70);
-  public static readonly GRAY_MATTER = new Tissue("grayMatter", 1120, 95);
-  public static readonly MUSCLE = new Tissue("muscle", 1010, 45);
-  public static readonly BLOOD = new Tissue("blood", 1440, 290);
-  public static readonly CSF = new Tissue("csf", 4000, 2000);
+  public static readonly FAT = new Tissue("fat", TISSUE_TIMES.FAT_T1, TISSUE_TIMES.FAT_T2);
+  public static readonly WHITE_MATTER = new Tissue(
+    "whiteMatter",
+    TISSUE_TIMES.WHITE_MATTER_T1,
+    TISSUE_TIMES.WHITE_MATTER_T2,
+  );
+  public static readonly GRAY_MATTER = new Tissue(
+    "grayMatter",
+    TISSUE_TIMES.GRAY_MATTER_T1,
+    TISSUE_TIMES.GRAY_MATTER_T2,
+  );
+  public static readonly MUSCLE = new Tissue("muscle", TISSUE_TIMES.MUSCLE_T1, TISSUE_TIMES.MUSCLE_T2);
+  public static readonly BLOOD = new Tissue("blood", TISSUE_TIMES.BLOOD_T1, TISSUE_TIMES.BLOOD_T2);
+  public static readonly CSF = new Tissue("csf", TISSUE_TIMES.CSF_T1, TISSUE_TIMES.CSF_T2);
   public static readonly CUSTOM = new Tissue("custom", null, null);
 
   public static readonly enumeration = new Enumeration(Tissue);

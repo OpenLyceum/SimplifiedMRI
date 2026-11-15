@@ -15,9 +15,9 @@ import { SimplifiedMRIPanel } from "../../common/SimplifiedMRIPanel.js";
 import { CoilNode } from "../../common/view/CoilNode.js";
 import { createCheckbox, createPanelTitle, createPushButton } from "../../common/view/controlHelpers.js";
 import { MainMagnetPanel } from "../../common/view/MainMagnetPanel.js";
-import { LAYOUT, ResonanceScreenView } from "../../common/view/ResonanceScreenView.js";
+import { ResonanceScreenView } from "../../common/view/ResonanceScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
-import { CHAMBER, DETECTOR, MAGNET } from "../../SimplifiedMRIConstants.js";
+import { CHAMBER, DETECTOR, MAGNET, MRI_LAYOUT, RESONANCE_LAYOUT } from "../../SimplifiedMRIConstants.js";
 import type { MRIModel } from "../model/MRIModel.js";
 import { DetectorNode } from "./DetectorNode.js";
 import { DetectorPanel } from "./DetectorPanel.js";
@@ -61,22 +61,28 @@ export class MRIScreenView extends ResonanceScreenView {
     );
     const horizontalCoil = new CoilNode(
       chamber.width,
-      LAYOUT.GRADIENT_COIL_THICKNESS,
+      RESONANCE_LAYOUT.GRADIENT_COIL_THICKNESS,
       "horizontal",
       horizontalStrength,
       {
-        segments: 8,
-        loops: 3,
+        segments: MRI_LAYOUT.HORIZONTAL_COIL_SEGMENTS,
+        loops: MRI_LAYOUT.COIL_LOOPS,
         left: chamber.minX,
         top: this.gradientCoilTop,
       },
     );
-    const verticalCoil = new CoilNode(chamber.height, LAYOUT.GRADIENT_COIL_THICKNESS, "vertical", verticalStrength, {
-      segments: 7,
-      loops: 3,
-      left: this.layoutBounds.minX + LAYOUT.VERTICAL_COIL_LEFT,
-      top: chamber.minY,
-    });
+    const verticalCoil = new CoilNode(
+      chamber.height,
+      RESONANCE_LAYOUT.GRADIENT_COIL_THICKNESS,
+      "vertical",
+      verticalStrength,
+      {
+        segments: MRI_LAYOUT.VERTICAL_COIL_SEGMENTS,
+        loops: MRI_LAYOUT.COIL_LOOPS,
+        left: this.layoutBounds.minX + RESONANCE_LAYOUT.VERTICAL_COIL_LEFT,
+        top: chamber.minY,
+      },
+    );
 
     const detectorBounds = t.modelToViewBounds(
       new Bounds2(
@@ -112,7 +118,7 @@ export class MRIScreenView extends ResonanceScreenView {
     });
     const headPanel = new SimplifiedMRIPanel(
       new VBox({
-        spacing: 6,
+        spacing: MRI_LAYOUT.PANEL_SPACING,
         align: "left",
         children: [
           createPanelTitle(common.showStringProperty),

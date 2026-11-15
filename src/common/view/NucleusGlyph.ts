@@ -13,6 +13,7 @@ import { Shape } from "scenerystack/kite";
 import type { TPaint } from "scenerystack/scenery";
 import { Node, type NodeOptions, Path } from "scenerystack/scenery";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
+import { GLYPH } from "../../SimplifiedMRIConstants.js";
 
 export class NucleusGlyph extends Node {
   private readonly arrow: Path;
@@ -29,42 +30,60 @@ export class NucleusGlyph extends Node {
   public constructor(radius: number, bodyFill: TPaint, providedOptions?: NodeOptions) {
     super();
 
-    const arrowLength = 1.45 * radius;
-    const headLength = 0.55 * radius;
-    const headWidth = 0.7 * radius;
-    const shaftWidth = 0.22 * radius;
+    const arrowLength = GLYPH.ARROW_LENGTH_FACTOR * radius;
+    const headLength = GLYPH.HEAD_LENGTH_FACTOR * radius;
+    const headWidth = GLYPH.HEAD_WIDTH_FACTOR * radius;
+    const shaftWidth = GLYPH.SHAFT_WIDTH_FACTOR * radius;
 
     // Arrow pointing up (−y) in local coordinates, centred on the donut.
     const arrowShape = new Shape()
-      .moveTo(-shaftWidth / 2, arrowLength * 0.75)
+      .moveTo(-shaftWidth / 2, arrowLength * GLYPH.TAIL_LENGTH_FACTOR)
       .lineTo(-shaftWidth / 2, -arrowLength + headLength)
       .lineTo(-headWidth / 2, -arrowLength + headLength)
       .lineTo(0, -arrowLength)
       .lineTo(headWidth / 2, -arrowLength + headLength)
       .lineTo(shaftWidth / 2, -arrowLength + headLength)
-      .lineTo(shaftWidth / 2, arrowLength * 0.75)
+      .lineTo(shaftWidth / 2, arrowLength * GLYPH.TAIL_LENGTH_FACTOR)
       .close();
     this.arrow = new Path(arrowShape, {
       fill: SimplifiedMRIColors.nucleusArrowColorProperty,
       stroke: SimplifiedMRIColors.nucleusStrokeColorProperty,
-      lineWidth: 0.6,
+      lineWidth: GLYPH.ARROW_LINE_WIDTH,
     });
 
-    this.body = new Path(Shape.ellipse(0, 0, radius, radius * 0.42, 0), {
+    this.body = new Path(Shape.ellipse(0, 0, radius, radius * GLYPH.BODY_RADIUS_FACTOR, 0), {
       fill: bodyFill,
       stroke: SimplifiedMRIColors.nucleusStrokeColorProperty,
-      lineWidth: 0.8,
+      lineWidth: GLYPH.LINE_WIDTH,
     });
-    const hole = new Path(Shape.ellipse(0, -radius * 0.05, radius * 0.32, radius * 0.12, 0), {
-      fill: SimplifiedMRIColors.nucleusStrokeColorProperty,
-      opacity: 0.5,
-    });
+    const hole = new Path(
+      Shape.ellipse(
+        0,
+        -radius * GLYPH.HOLE_Y_FACTOR,
+        radius * GLYPH.HOLE_WIDTH_FACTOR,
+        radius * GLYPH.HOLE_HEIGHT_FACTOR,
+        0,
+      ),
+      {
+        fill: SimplifiedMRIColors.nucleusStrokeColorProperty,
+        opacity: GLYPH.HOLE_OPACITY,
+      },
+    );
 
-    this.cone = new Path(Shape.ellipse(0, -arrowLength * 0.95, arrowLength * 0.42, arrowLength * 0.13, 0), {
-      stroke: SimplifiedMRIColors.precessionConeColorProperty,
-      lineWidth: 0.8,
-      visible: false,
-    });
+    this.cone = new Path(
+      Shape.ellipse(
+        0,
+        -arrowLength * GLYPH.CONE_Y_FACTOR,
+        arrowLength * GLYPH.CONE_WIDTH_FACTOR,
+        arrowLength * GLYPH.CONE_HEIGHT_FACTOR,
+        0,
+      ),
+      {
+        stroke: SimplifiedMRIColors.precessionConeColorProperty,
+        lineWidth: GLYPH.LINE_WIDTH,
+        visible: false,
+      },
+    );
 
     this.children = [this.cone, this.arrow, this.body, hole];
     this.mutate(providedOptions);

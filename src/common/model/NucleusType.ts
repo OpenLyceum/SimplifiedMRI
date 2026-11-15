@@ -10,15 +10,16 @@
  */
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
+import { GYROMAGNETIC_RATIOS } from "../../SimplifiedMRIConstants.js";
 
 export class NucleusType extends EnumerationValue {
-  public static readonly HYDROGEN_1 = new NucleusType(42.577, "hydrogen1");
-  public static readonly NITROGEN_14 = new NucleusType(3.077, "nitrogen14");
-  public static readonly SODIUM_23 = new NucleusType(11.262, "sodium23");
-  public static readonly CARBON_13 = new NucleusType(10.708, "carbon13");
-  public static readonly OXYGEN_17 = new NucleusType(5.772, "oxygen17");
-  public static readonly SULFUR_33 = new NucleusType(3.272, "sulfur33");
-  public static readonly UNKNOWN = new NucleusType(12.103, "unknown");
+  public static readonly HYDROGEN_1 = new NucleusType(GYROMAGNETIC_RATIOS.HYDROGEN_1, "hydrogen1");
+  public static readonly NITROGEN_14 = new NucleusType(GYROMAGNETIC_RATIOS.NITROGEN_14, "nitrogen14");
+  public static readonly SODIUM_23 = new NucleusType(GYROMAGNETIC_RATIOS.SODIUM_23, "sodium23");
+  public static readonly CARBON_13 = new NucleusType(GYROMAGNETIC_RATIOS.CARBON_13, "carbon13");
+  public static readonly OXYGEN_17 = new NucleusType(GYROMAGNETIC_RATIOS.OXYGEN_17, "oxygen17");
+  public static readonly SULFUR_33 = new NucleusType(GYROMAGNETIC_RATIOS.SULFUR_33, "sulfur33");
+  public static readonly UNKNOWN = new NucleusType(GYROMAGNETIC_RATIOS.UNKNOWN, "unknown");
 
   public static readonly enumeration = new Enumeration(NucleusType);
 

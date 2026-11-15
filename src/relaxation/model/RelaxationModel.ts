@@ -24,7 +24,7 @@ import { toRadians } from "scenerystack/dot";
 import type { TModel } from "scenerystack/joist";
 import { TimeSpeed } from "scenerystack/scenery-phet";
 import { TimeModel } from "../../common/TimeModel.js";
-import { RELAXATION } from "../../SimplifiedMRIConstants.js";
+import { RELAXATION, TIME } from "../../SimplifiedMRIConstants.js";
 import {
   chooseWindow,
   EQUILIBRIUM,
@@ -35,12 +35,6 @@ import {
   transverseMagnitude,
 } from "./blochPhysics.js";
 import { Tissue } from "./Tissue.js";
-
-/** Wall-clock time advanced by one press of the step button (s). */
-const STEP_DT = 1 / 25;
-
-/** Largest wall-clock step accepted (s). */
-const MAX_DT = 0.1;
 
 /** One recorded point of the relaxation curves. */
 export type RelaxationSample = { readonly t: number; readonly mz: number; readonly mxy: number };
@@ -53,10 +47,10 @@ export class RelaxationModel implements TModel {
 
   // ── Controls ────────────────────────────────────────────────────────────────
   public readonly tissueProperty = new EnumerationProperty(DEFAULT_TISSUE);
-  public readonly t1Property = new NumberProperty(DEFAULT_TISSUE.t1 ?? 1000, {
+  public readonly t1Property = new NumberProperty(DEFAULT_TISSUE.t1 ?? RELAXATION.FALLBACK_T1, {
     range: RELAXATION.T1_RANGE,
   });
-  public readonly t2Property = new NumberProperty(DEFAULT_TISSUE.t2 ?? 100, {
+  public readonly t2Property = new NumberProperty(DEFAULT_TISSUE.t2 ?? RELAXATION.FALLBACK_T2, {
     range: RELAXATION.T2_RANGE,
   });
   public readonly flipAngleProperty = new NumberProperty(RELAXATION.FLIP_ANGLE_DEFAULT, {
@@ -113,8 +107,12 @@ export class RelaxationModel implements TModel {
   private settingFromTissue = false;
 
   public constructor() {
-    this.longitudinalWindowProperty = new DerivedProperty([this.t1Property], (t1) => chooseWindow(5 * t1));
-    this.transverseWindowProperty = new DerivedProperty([this.t2Property], (t2) => chooseWindow(5 * t2));
+    this.longitudinalWindowProperty = new DerivedProperty([this.t1Property], (t1) =>
+      chooseWindow(RELAXATION.WINDOW_TIME_CONSTANTS * t1),
+    );
+    this.transverseWindowProperty = new DerivedProperty([this.t2Property], (t2) =>
+      chooseWindow(RELAXATION.WINDOW_TIME_CONSTANTS * t2),
+    );
 
     // Choosing a tissue sets T1 and T2; moving either slider switches to Custom.
     this.tissueProperty.lazyLink((tissue) => {
@@ -193,12 +191,12 @@ export class RelaxationModel implements TModel {
   }
 
   public stepOnce(): void {
-    this.stepModel(STEP_DT);
+    this.stepModel(TIME.STEP_DT);
   }
 
   /** Advances by dt wall-clock seconds. */
   public stepModel(dt: number): void {
-    const h = Math.min(dt, MAX_DT);
+    const h = Math.min(dt, TIME.MAX_DT);
     this.labPhase = (this.labPhase + 2 * Math.PI * RELAXATION.DISPLAY_PRECESSION_RATE * h) % (2 * Math.PI);
     this.timer.timeProperty.value += h;
 
