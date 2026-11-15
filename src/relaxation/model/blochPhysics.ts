@@ -48,6 +48,7 @@ export function transverseMagnitude(m: Magnetization): number {
 /**
  * Mz(t) after a pulse of flip angle α from equilibrium: 1 − (1 − cos α) e^(−t/T1).
  * Used by the tests and for the zero crossing of an inversion recovery.
+ * @internal Exported for unit tests; not part of the application API.
  */
 export function longitudinalAfterPulse(flipAngle: number, t: number, t1: number): number {
   return 1 - (1 - Math.cos(flipAngle)) * Math.exp(-t / t1);

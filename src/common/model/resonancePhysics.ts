@@ -46,6 +46,7 @@ export function absorptionProbability(detuning: number): number {
  * exaggeration; see thermalAlignedExcess() for the real value.
  *
  * @param field - magnetic field (T); clamped to the main-field range
+ * @internal Exported for unit tests; not part of the application API.
  */
 export function targetAlignedFraction(field: number): number {
   const range = MAGNET.MAIN_FIELD_RANGE;
@@ -62,6 +63,7 @@ export function targetAlignedFraction(field: number): number {
  *
  * @param frequency - Larmor frequency (MHz)
  * @param temperature - temperature (K)
+ * @internal Exported for unit tests; not part of the application API.
  */
 export function thermalAlignedExcess(frequency: number, temperature: number): number {
   const energy = PHYSICAL.PLANCK * frequency * UNITS.HZ_PER_MHZ;
