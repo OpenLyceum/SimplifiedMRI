@@ -11,23 +11,24 @@
  */
 
 import { toFixed } from "scenerystack/dot";
+import { CHART_TICKS } from "../../SimplifiedMRIConstants.js";
 
 /**
  * Pick a "nice" step (1, 2, or 5 × 10ⁿ) that yields roughly `targetDivisions`
  * segments across `rangeSpan`. The standard "nice numbers" algorithm, so ticks
  * land on round values (0, 1, 2 … rather than 0.7, 1.4 …).
  */
-export const niceStep = (rangeSpan: number, targetDivisions = 5): number => {
+export const niceStep = (rangeSpan: number, targetDivisions: number = CHART_TICKS.DEFAULT_DIVISIONS): number => {
   const safeSpan = Number.isFinite(rangeSpan) && rangeSpan > 0 ? rangeSpan : 1;
   const raw = safeSpan / targetDivisions;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
   const normalized = raw / magnitude;
   let coefficient: number;
-  if (normalized < 1.5) {
+  if (normalized < CHART_TICKS.UNIT_THRESHOLD) {
     coefficient = 1;
-  } else if (normalized < 3) {
+  } else if (normalized < CHART_TICKS.TWO_THRESHOLD) {
     coefficient = 2;
-  } else if (normalized < 7) {
+  } else if (normalized < CHART_TICKS.FIVE_THRESHOLD) {
     coefficient = 5;
   } else {
     coefficient = 10;
@@ -40,7 +41,7 @@ export const decimalPlacesForStep = (step: number): number => {
   if (step <= 0 || !Number.isFinite(step)) {
     return 0;
   }
-  return Math.min(4, Math.max(0, -Math.floor(Math.log10(step))));
+  return Math.min(CHART_TICKS.MAX_DECIMAL_PLACES, Math.max(0, -Math.floor(Math.log10(step))));
 };
 
 /** Format a tick or readout value to a fixed number of decimals (dot's stable toFixed). */

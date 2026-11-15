@@ -18,24 +18,13 @@ import { Shape } from "scenerystack/kite";
 import type { ModelViewTransform2 } from "scenerystack/phetcommon";
 import { Node, Path, Rectangle } from "scenerystack/scenery";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CHAMBER, RADIO } from "../../SimplifiedMRIConstants.js";
+import { CHAMBER, RADIO, RADIO_VIEW } from "../../SimplifiedMRIConstants.js";
 import type { ResonanceModel } from "../model/ResonanceModel.js";
-
-/** Number of horizontal bands in the wave view. */
-const BAND_COUNT = 48;
-
-/** Peak band opacity at full power. */
-const MAX_BAND_OPACITY = 0.38;
-
-/** Displayed wavelength (cm) = this / frequency (MHz), clamped (radio wavelengths are metres). */
-const WAVELENGTH_FACTOR = 360;
-const MIN_WAVELENGTH = 2.2;
-const MAX_WAVELENGTH = 18;
 
 /** Wiggle drawn for a photon: `cycles` periods over `length` px, along +x. */
 function wiggleShape(length: number, amplitude: number, cycles: number): Shape {
   const shape = new Shape();
-  const segments = 24;
+  const segments = RADIO_VIEW.WIGGLE_SEGMENTS;
   for (let i = 0; i <= segments; i++) {
     const s = i / segments;
     const x = (s - 0.5) * length;
@@ -52,9 +41,9 @@ function wiggleShape(length: number, amplitude: number, cycles: number): Shape {
 /** Three arcs, PhET's emitted wave cycle, travelling along +x. */
 function packetShape(height: number): Shape {
   const shape = new Shape();
-  for (let k = 0; k < 3; k++) {
-    const x = (k - 1) * 5;
-    shape.moveTo(x, -height / 2).quadraticCurveTo(x + 5, 0, x, height / 2);
+  for (let k = 0; k < RADIO_VIEW.PACKET_ARCS; k++) {
+    const x = (k - 1) * RADIO_VIEW.PACKET_ARC_WIDTH;
+    shape.moveTo(x, -height / 2).quadraticCurveTo(x + RADIO_VIEW.PACKET_ARC_WIDTH, 0, x, height / 2);
   }
   return shape;
 }
@@ -78,20 +67,34 @@ export class RadioWavesNode extends Node {
     this.modelViewTransform = modelViewTransform;
 
     const scale = modelViewTransform.modelToViewDeltaX(1);
-    this.incomingShape = wiggleShape(1.2 * scale, 0.18 * scale, 2);
-    this.emittedPhotonShape = wiggleShape(1.2 * scale, 0.18 * scale, 2);
-    this.emittedPacketShape = packetShape(0.9 * scale);
+    this.incomingShape = wiggleShape(
+      RADIO_VIEW.PHOTON_LENGTH * scale,
+      RADIO_VIEW.PHOTON_AMPLITUDE * scale,
+      RADIO_VIEW.PHOTON_CYCLES,
+    );
+    this.emittedPhotonShape = wiggleShape(
+      RADIO_VIEW.PHOTON_LENGTH * scale,
+      RADIO_VIEW.PHOTON_AMPLITUDE * scale,
+      RADIO_VIEW.PHOTON_CYCLES,
+    );
+    this.emittedPacketShape = packetShape(RADIO_VIEW.PACKET_HEIGHT * scale);
 
     // Bands cover the chamber; the source spans a little wider, but the chamber walls bound
     // what is drawn.
     const topLeft = modelViewTransform.modelToViewXY(0, CHAMBER.HEIGHT);
     const bottomRight = modelViewTransform.modelToViewXY(CHAMBER.WIDTH, 0);
-    const bandHeight = (bottomRight.y - topLeft.y) / BAND_COUNT;
+    const bandHeight = (bottomRight.y - topLeft.y) / RADIO_VIEW.BAND_COUNT;
     const bandLayer = new Node();
-    for (let i = 0; i < BAND_COUNT; i++) {
-      const band = new Rectangle(topLeft.x, topLeft.y + i * bandHeight, bottomRight.x - topLeft.x, bandHeight + 0.5, {
-        fill: SimplifiedMRIColors.radioWaveColorProperty,
-      });
+    for (let i = 0; i < RADIO_VIEW.BAND_COUNT; i++) {
+      const band = new Rectangle(
+        topLeft.x,
+        topLeft.y + i * bandHeight,
+        bottomRight.x - topLeft.x,
+        bandHeight + RADIO_VIEW.BAND_OVERLAP,
+        {
+          fill: SimplifiedMRIColors.radioWaveColorProperty,
+        },
+      );
       this.bands.push(band);
       bandLayer.addChild(band);
     }
@@ -100,8 +103,11 @@ export class RadioWavesNode extends Node {
     this.incomingLayer.visibleProperty = new DerivedProperty([model.radioViewProperty], (view) => view === "photon");
 
     // Photons outside the chamber and the path to the detector are not drawn.
-    const clipTopLeft = modelViewTransform.modelToViewXY(-1.5, CHAMBER.HEIGHT + 0.6);
-    const clipBottom = modelViewTransform.modelToViewY(-0.8);
+    const clipTopLeft = modelViewTransform.modelToViewXY(
+      -RADIO_VIEW.CLIP_LEFT_MARGIN,
+      CHAMBER.HEIGHT + RADIO_VIEW.CLIP_TOP_MARGIN,
+    );
+    const clipBottom = modelViewTransform.modelToViewY(-RADIO_VIEW.CLIP_BOTTOM_MARGIN);
     this.clipArea = Shape.rect(clipTopLeft.x, clipTopLeft.y, rightEdge - clipTopLeft.x, clipBottom - clipTopLeft.y);
 
     this.children = [bandLayer, this.incomingLayer, this.emittedLayer];
@@ -116,15 +122,15 @@ export class RadioWavesNode extends Node {
     // ── Bands ─────────────────────────────────────────────────────────────────
     if (isWaveView) {
       const wavelength = Math.min(
-        MAX_WAVELENGTH,
-        Math.max(MIN_WAVELENGTH, WAVELENGTH_FACTOR / model.frequencyProperty.value),
+        RADIO_VIEW.MAX_WAVELENGTH,
+        Math.max(RADIO_VIEW.MIN_WAVELENGTH, RADIO_VIEW.WAVELENGTH_FACTOR / model.frequencyProperty.value),
       );
       const k = (2 * Math.PI) / wavelength;
       this.wavePhase = (this.wavePhase + k * RADIO.PHOTON_SPEED * dt) % (2 * Math.PI);
-      const amplitude = (MAX_BAND_OPACITY * model.powerProperty.value) / RADIO.POWER_RANGE.max;
+      const amplitude = (RADIO_VIEW.MAX_BAND_OPACITY * model.powerProperty.value) / RADIO.POWER_RANGE.max;
       this.bands.forEach((band, i) => {
         // Band i is counted from the top; y is the band centre in cm.
-        const y = CHAMBER.HEIGHT * (1 - (i + 0.5) / BAND_COUNT);
+        const y = CHAMBER.HEIGHT * (1 - (i + 0.5) / RADIO_VIEW.BAND_COUNT);
         band.opacity = amplitude * (0.5 + 0.5 * Math.cos(k * y - this.wavePhase));
       });
     }
@@ -163,7 +169,7 @@ export class RadioWavesNode extends Node {
     if (!path) {
       path = new Path(isEmitted ? this.emittedPhotonShape : this.incomingShape, {
         stroke: isEmitted ? SimplifiedMRIColors.emittedPhotonColorProperty : SimplifiedMRIColors.radioWaveColorProperty,
-        lineWidth: 2,
+        lineWidth: RADIO_VIEW.PHOTON_LINE_WIDTH,
         // Incoming photons travel up: turn the +x wiggle to vertical.
         rotation: isEmitted ? 0 : -Math.PI / 2,
       });

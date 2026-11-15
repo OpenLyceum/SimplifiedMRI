@@ -44,11 +44,11 @@ decisions: [`doc/implementation-notes.md`](doc/implementation-notes.md).
 | `src/common/model/resonancePhysics.ts` | Pure functions: Larmor frequency, line shape, population target, real thermal excess |
 | `src/common/model/sampleGeometry.ts` | NMR grid, head and ear ellipses, tumour lattice (PhET geometry in cm) |
 | `src/common/model/Nucleus.ts` | Spin state, relaxation countdown, damped glyph swing, precession phase |
-| `src/common/view/ResonanceScreenView.ts` | Shared play area and layout constants (`LAYOUT`) |
+| `src/common/view/ResonanceScreenView.ts` | Shared play area using `RESONANCE_LAYOUT` from the constants module |
 | `src/common/view/RadioWavesNode.ts` | Wave bands and pooled photon glyphs |
 | `src/relaxation/model/blochPhysics.ts` | Exact Bloch relaxation, x′ rotation, isochromat offsets, chart windows |
 | `src/relaxation/model/Tissue.ts` | Tissue T1/T2 presets at 1.5 T with references |
-| `src/SimplifiedMRIConstants.ts` | Grouped `as const` blocks: `CHAMBER`, `MAGNET`, `RADIO`, `RESONANCE`, `SPIN`, `NUCLEUS`, `SAMPLE`, `DETECTOR`, `RELAXATION`, `FONTS` |
+| `src/SimplifiedMRIConstants.ts` | Grouped `as const` blocks: `CHAMBER`, `MAGNET`, `RADIO`, `RESONANCE`, `SPIN`, `NUCLEUS`, `SAMPLE`, `DETECTOR`, `RELAXATION`, `FONTS`, plus controls, readout precision, drawing, chart, and screen-icon settings |
 | `src/SimplifiedMRIColors.ts` | Every colour, default and projector |
 | `src/preferences/` | One preference, Snap sliders to resonance (`?snapToResonance=false`), passed to the NMR and MRI screens |
 

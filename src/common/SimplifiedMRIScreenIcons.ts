@@ -14,14 +14,14 @@ import { Line, Node, Path, Rectangle } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
 import { ScreenIcon } from "scenerystack/sim";
 import SimplifiedMRIColors from "../SimplifiedMRIColors.js";
+import { ICON_WAVE, MRI_ICON, NMR_ICON, RELAXATION_ICON, SCREEN_ICONS } from "../SimplifiedMRIConstants.js";
 import { CoilNode } from "./view/CoilNode.js";
 import { NucleusGlyph } from "./view/NucleusGlyph.js";
 
-const W = 548;
-const H = 373;
-
 function background(): Rectangle {
-  return new Rectangle(0, 0, W, H, { fill: SimplifiedMRIColors.backgroundColorProperty });
+  return new Rectangle(0, 0, SCREEN_ICONS.WIDTH, SCREEN_ICONS.HEIGHT, {
+    fill: SimplifiedMRIColors.backgroundColorProperty,
+  });
 }
 
 function iconFrom(content: Node): ScreenIcon {
@@ -35,8 +35,8 @@ function iconFrom(content: Node): ScreenIcon {
 /** Vertical sine squiggle from (x, yBottom) up to yTop. */
 function squiggle(x: number, yBottom: number, yTop: number, cycles: number, amplitude: number): Shape {
   const shape = new Shape();
-  for (let i = 0; i <= 80; i++) {
-    const s = i / 80;
+  for (let i = 0; i <= ICON_WAVE.SEGMENTS; i++) {
+    const s = i / ICON_WAVE.SEGMENTS;
     const px = x + amplitude * Math.sin(2 * Math.PI * cycles * s);
     const py = yBottom + (yTop - yBottom) * s;
     if (i === 0) {
@@ -49,28 +49,31 @@ function squiggle(x: number, yBottom: number, yTop: number, cycles: number, ampl
 }
 
 export function createNMRIcon(): ScreenIcon {
-  const lowerY = 290;
-  const upperY = 110;
-  const levelOptions = { stroke: SimplifiedMRIColors.energyLevelResonantColorProperty, lineWidth: 8 };
+  const lowerY = NMR_ICON.LOWER_Y;
+  const upperY = NMR_ICON.UPPER_Y;
+  const levelOptions = { stroke: SimplifiedMRIColors.energyLevelResonantColorProperty, lineWidth: NMR_ICON.LINE_WIDTH };
   const children: Node[] = [
     background(),
-    new Line(170, lowerY, 500, lowerY, levelOptions),
-    new Line(170, upperY, 500, upperY, levelOptions),
-    new Path(squiggle(90, lowerY, upperY, 5, 22), {
+    new Line(NMR_ICON.LEVEL_LEFT, lowerY, NMR_ICON.LEVEL_RIGHT, lowerY, levelOptions),
+    new Line(NMR_ICON.LEVEL_LEFT, upperY, NMR_ICON.LEVEL_RIGHT, upperY, levelOptions),
+    new Path(squiggle(NMR_ICON.WAVE_X, lowerY, upperY, NMR_ICON.WAVE_CYCLES, NMR_ICON.WAVE_AMPLITUDE), {
       stroke: SimplifiedMRIColors.radioWaveColorProperty,
-      lineWidth: 8,
+      lineWidth: NMR_ICON.LINE_WIDTH,
     }),
   ];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < NMR_ICON.LOWER_COUNT; i++) {
     children.push(
-      new NucleusGlyph(26, SimplifiedMRIColors.hydrogen1ColorProperty, { x: 215 + i * 75, y: lowerY - 30 }),
+      new NucleusGlyph(NMR_ICON.NUCLEUS_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty, {
+        x: NMR_ICON.NUCLEUS_LEFT + i * NMR_ICON.NUCLEUS_SPACING,
+        y: lowerY - NMR_ICON.NUCLEUS_Y_OFFSET,
+      }),
     );
   }
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < NMR_ICON.UPPER_COUNT; i++) {
     children.push(
-      new NucleusGlyph(26, SimplifiedMRIColors.hydrogen1ColorProperty, {
-        x: 215 + i * 75,
-        y: upperY - 30,
+      new NucleusGlyph(NMR_ICON.NUCLEUS_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty, {
+        x: NMR_ICON.NUCLEUS_LEFT + i * NMR_ICON.NUCLEUS_SPACING,
+        y: upperY - NMR_ICON.NUCLEUS_Y_OFFSET,
         rotation: Math.PI,
       }),
     );
@@ -79,32 +82,64 @@ export function createNMRIcon(): ScreenIcon {
 }
 
 export function createMRIIcon(): ScreenIcon {
-  const full = new NumberProperty(0.8);
-  const upper = new CoilNode(420, 40, "horizontal", full, { loops: 4, left: 64, top: 12 });
-  const lower = new CoilNode(420, 40, "horizontal", full, { loops: 4, left: 64, bottom: H - 12 });
+  const full = new NumberProperty(MRI_ICON.STRENGTH);
+  const upper = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", full, {
+    loops: MRI_ICON.COIL_LOOPS,
+    left: MRI_ICON.COIL_LEFT,
+    top: MRI_ICON.COIL_MARGIN,
+  });
+  const lower = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", full, {
+    loops: MRI_ICON.COIL_LOOPS,
+    left: MRI_ICON.COIL_LEFT,
+    bottom: SCREEN_ICONS.HEIGHT - MRI_ICON.COIL_MARGIN,
+  });
   const headFill = SimplifiedMRIColors.headStrokeColorProperty;
-  const head = new Path(Shape.ellipse(W / 2, H / 2, 110, 128, 0), {
-    fill: SimplifiedMRIColors.headFillColorProperty,
-    stroke: headFill,
-    lineWidth: 6,
-  });
-  const ears = [W / 2 - 128, W / 2 + 128].map(
-    (x) =>
-      new Path(Shape.ellipse(x, H / 2 + 6, 20, 30, 0), {
-        fill: SimplifiedMRIColors.headFillColorProperty,
-        stroke: headFill,
-        lineWidth: 5,
-      }),
+  const head = new Path(
+    Shape.ellipse(SCREEN_ICONS.WIDTH / 2, SCREEN_ICONS.HEIGHT / 2, MRI_ICON.HEAD_RADIUS_X, MRI_ICON.HEAD_RADIUS_Y, 0),
+    {
+      fill: SimplifiedMRIColors.headFillColorProperty,
+      stroke: headFill,
+      lineWidth: MRI_ICON.HEAD_LINE_WIDTH,
+    },
   );
-  const tumor = new Path(Shape.ellipse(W / 2 + 40, H / 2 - 55, 42, 22, 0), {
-    fill: SimplifiedMRIColors.tumorNucleusColorProperty,
-    opacity: 0.8,
-  });
+  const ears = [SCREEN_ICONS.WIDTH / 2 - MRI_ICON.EAR_X_OFFSET, SCREEN_ICONS.WIDTH / 2 + MRI_ICON.EAR_X_OFFSET].map(
+    (x) =>
+      new Path(
+        Shape.ellipse(
+          x,
+          SCREEN_ICONS.HEIGHT / 2 + MRI_ICON.EAR_Y_OFFSET,
+          MRI_ICON.EAR_RADIUS_X,
+          MRI_ICON.EAR_RADIUS_Y,
+          0,
+        ),
+        {
+          fill: SimplifiedMRIColors.headFillColorProperty,
+          stroke: headFill,
+          lineWidth: MRI_ICON.EAR_LINE_WIDTH,
+        },
+      ),
+  );
+  const tumor = new Path(
+    Shape.ellipse(
+      SCREEN_ICONS.WIDTH / 2 + MRI_ICON.TUMOR_X_OFFSET,
+      SCREEN_ICONS.HEIGHT / 2 - MRI_ICON.TUMOR_Y_OFFSET,
+      MRI_ICON.TUMOR_RADIUS_X,
+      MRI_ICON.TUMOR_RADIUS_Y,
+      0,
+    ),
+    {
+      fill: SimplifiedMRIColors.tumorNucleusColorProperty,
+      opacity: MRI_ICON.TUMOR_OPACITY,
+    },
+  );
   const nuclei: Node[] = [];
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
       nuclei.push(
-        new NucleusGlyph(15, SimplifiedMRIColors.hydrogen1ColorProperty, { x: W / 2 + i * 62, y: H / 2 + 20 + j * 52 }),
+        new NucleusGlyph(MRI_ICON.NUCLEUS_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty, {
+          x: SCREEN_ICONS.WIDTH / 2 + i * MRI_ICON.NUCLEUS_SPACING_X,
+          y: SCREEN_ICONS.HEIGHT / 2 + MRI_ICON.NUCLEUS_Y_OFFSET + j * MRI_ICON.NUCLEUS_SPACING_Y,
+        }),
       );
     }
   }
@@ -112,45 +147,54 @@ export function createMRIIcon(): ScreenIcon {
 }
 
 export function createRelaxationIcon(): ScreenIcon {
-  const cx = 150;
-  const cy = 200;
-  const r = 120;
-  const sphere = new Path(Shape.circle(cx, cy, r), { stroke: SimplifiedMRIColors.sphereColorProperty, lineWidth: 5 });
-  const equator = new Path(Shape.ellipse(cx, cy, r, r * 0.3, 0), {
+  const cx = RELAXATION_ICON.SPHERE_X;
+  const cy = RELAXATION_ICON.SPHERE_Y;
+  const r = RELAXATION_ICON.SPHERE_RADIUS;
+  const sphere = new Path(Shape.circle(cx, cy, r), {
     stroke: SimplifiedMRIColors.sphereColorProperty,
-    lineWidth: 4,
+    lineWidth: RELAXATION_ICON.LINE_WIDTH,
   });
-  const field = new ArrowNode(cx, cy, cx, cy - r - 40, {
-    headHeight: 30,
-    headWidth: 30,
-    tailWidth: 8,
+  const equator = new Path(Shape.ellipse(cx, cy, r, r * RELAXATION_ICON.EQUATOR_HEIGHT_FACTOR, 0), {
+    stroke: SimplifiedMRIColors.sphereColorProperty,
+    lineWidth: RELAXATION_ICON.EQUATOR_LINE_WIDTH,
+  });
+  const field = new ArrowNode(cx, cy, cx, cy - r - RELAXATION_ICON.FIELD_EXTENSION, {
+    headHeight: RELAXATION_ICON.FIELD_HEAD_SIZE,
+    headWidth: RELAXATION_ICON.FIELD_HEAD_SIZE,
+    tailWidth: RELAXATION_ICON.FIELD_TAIL_WIDTH,
     fill: SimplifiedMRIColors.fieldColorProperty,
     stroke: null,
   });
-  const magnetization = new ArrowNode(cx, cy, cx + 90, cy - 70, {
-    headHeight: 34,
-    headWidth: 34,
-    tailWidth: 12,
-    fill: SimplifiedMRIColors.magnetizationColorProperty,
-    stroke: null,
-  });
+  const magnetization = new ArrowNode(
+    cx,
+    cy,
+    cx + RELAXATION_ICON.MAGNETIZATION_X,
+    cy - RELAXATION_ICON.MAGNETIZATION_Y,
+    {
+      headHeight: RELAXATION_ICON.MAGNETIZATION_HEAD_SIZE,
+      headWidth: RELAXATION_ICON.MAGNETIZATION_HEAD_SIZE,
+      tailWidth: RELAXATION_ICON.MAGNETIZATION_TAIL_WIDTH,
+      fill: SimplifiedMRIColors.magnetizationColorProperty,
+      stroke: null,
+    },
+  );
 
   // Recovery and decay curves on simple axes.
-  const left = 310;
-  const right = 530;
-  const top = 80;
-  const bottom = 320;
+  const left = RELAXATION_ICON.CHART_LEFT;
+  const right = RELAXATION_ICON.CHART_RIGHT;
+  const top = RELAXATION_ICON.CHART_TOP;
+  const bottom = RELAXATION_ICON.CHART_BOTTOM;
   const axes = new Path(new Shape().moveTo(left, top).lineTo(left, bottom).lineTo(right, bottom), {
     stroke: SimplifiedMRIColors.chartAxisColorProperty,
-    lineWidth: 5,
+    lineWidth: RELAXATION_ICON.LINE_WIDTH,
   });
   const recovery = new Shape();
   const decay = new Shape();
-  for (let i = 0; i <= 60; i++) {
-    const s = i / 60;
+  for (let i = 0; i <= RELAXATION_ICON.CURVE_SEGMENTS; i++) {
+    const s = i / RELAXATION_ICON.CURVE_SEGMENTS;
     const x = left + (right - left) * s;
-    const yRecovery = bottom - (bottom - top) * (1 - Math.exp(-4 * s));
-    const yDecay = bottom - (bottom - top) * Math.exp(-9 * s);
+    const yRecovery = bottom - (bottom - top) * (1 - Math.exp(-RELAXATION_ICON.RECOVERY_RATE * s));
+    const yDecay = bottom - (bottom - top) * Math.exp(-RELAXATION_ICON.DECAY_RATE * s);
     if (i === 0) {
       recovery.moveTo(x, yRecovery);
       decay.moveTo(x, yDecay);
@@ -168,8 +212,14 @@ export function createRelaxationIcon(): ScreenIcon {
         field,
         magnetization,
         axes,
-        new Path(recovery, { stroke: SimplifiedMRIColors.mzCurveColorProperty, lineWidth: 8 }),
-        new Path(decay, { stroke: SimplifiedMRIColors.mxyCurveColorProperty, lineWidth: 8 }),
+        new Path(recovery, {
+          stroke: SimplifiedMRIColors.mzCurveColorProperty,
+          lineWidth: RELAXATION_ICON.CURVE_LINE_WIDTH,
+        }),
+        new Path(decay, {
+          stroke: SimplifiedMRIColors.mxyCurveColorProperty,
+          lineWidth: RELAXATION_ICON.CURVE_LINE_WIDTH,
+        }),
       ],
     }),
   );

@@ -7,7 +7,7 @@
  */
 
 import { Vector2 } from "scenerystack/dot";
-import { CHAMBER, RESONANCE, SAMPLE } from "../../SimplifiedMRIConstants.js";
+import { CHAMBER, RESONANCE, SAMPLE, TUMOR_GEOMETRY } from "../../SimplifiedMRIConstants.js";
 import type { SpinState } from "./Nucleus.js";
 import type { NucleusSpec } from "./ResonanceModel.js";
 
@@ -43,10 +43,10 @@ export const EARS: readonly Ellipse[] = [
  * middle, 15% down from the top, 30% of the width and a sixth of the height.
  */
 export const TUMOR: Ellipse = {
-  centerX: CHAMBER.WIDTH * 0.5 + CHAMBER.WIDTH * 0.15,
-  centerY: CHAMBER.HEIGHT - CHAMBER.HEIGHT * 0.15 - CHAMBER.HEIGHT / 12,
-  radiusX: CHAMBER.WIDTH * 0.15,
-  radiusY: CHAMBER.HEIGHT / 12,
+  centerX: CHAMBER.WIDTH / 2 + CHAMBER.WIDTH * TUMOR_GEOMETRY.WIDTH_RADIUS_FRACTION,
+  centerY: CHAMBER.HEIGHT - CHAMBER.HEIGHT * TUMOR_GEOMETRY.TOP_INSET_FRACTION - TUMOR_GEOMETRY.HEIGHT_RADIUS,
+  radiusX: CHAMBER.WIDTH * TUMOR_GEOMETRY.WIDTH_RADIUS_FRACTION,
+  radiusY: TUMOR_GEOMETRY.HEIGHT_RADIUS,
 };
 
 /** Alternating initial spin states, as in PhET. */

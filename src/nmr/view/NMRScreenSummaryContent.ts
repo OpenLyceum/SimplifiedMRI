@@ -10,7 +10,7 @@ import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
-import { RESONANCE } from "../../SimplifiedMRIConstants.js";
+import { READOUT_PRECISION, RESONANCE } from "../../SimplifiedMRIConstants.js";
 import type { NMRModel } from "../model/NMRModel.js";
 
 export class NMRScreenSummaryContent extends ScreenSummaryContent {
@@ -29,9 +29,9 @@ export class NMRScreenSummaryContent extends ScreenSummaryContent {
       ],
       (pattern, onText, offText, field, frequency, power, aligned, strength) =>
         StringUtils.fillIn(pattern, {
-          field: toFixed(field, 2),
-          frequency: toFixed(frequency, 1),
-          power: toFixed(power, 0),
+          field: toFixed(field, READOUT_PRECISION.FIELD),
+          frequency: toFixed(frequency, READOUT_PRECISION.FREQUENCY),
+          power: toFixed(power, READOUT_PRECISION.POWER),
           aligned,
           total: model.nuclei.length,
           resonance: strength >= RESONANCE.INDICATOR_THRESHOLD && power > 0 ? onText : offText,

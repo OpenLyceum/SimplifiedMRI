@@ -10,6 +10,7 @@ import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
+import { READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 import type { RelaxationModel } from "../model/RelaxationModel.js";
 import { Tissue } from "../model/Tissue.js";
 
@@ -44,7 +45,13 @@ export class RelaxationScreenSummaryContent extends ScreenSummaryContent {
         model.mxyProperty,
       ],
       (pattern, tissue, t1, t2, mz, mxy) =>
-        StringUtils.fillIn(pattern, { tissue, t1, t2, mz: toFixed(mz, 2), mxy: toFixed(mxy, 2) }),
+        StringUtils.fillIn(pattern, {
+          tissue,
+          t1,
+          t2,
+          mz: toFixed(mz, READOUT_PRECISION.MAGNETIZATION),
+          mxy: toFixed(mxy, READOUT_PRECISION.MAGNETIZATION),
+        }),
     );
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,

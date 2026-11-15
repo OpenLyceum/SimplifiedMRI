@@ -14,6 +14,7 @@ import { Range } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import type { NumberControl } from "scenerystack/scenery-phet";
 import { createNumberControl } from "../../common/view/controlHelpers.js";
+import { LOG_TIME_CONTROL, READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 
 export function createLogTimeControl(
   timeProperty: PhetioProperty<number>,
@@ -47,17 +48,18 @@ export function createLogTimeControl(
   const format = (log: number): string =>
     StringUtils.fillIn(config.patternProperty.value, { value: Math.round(10 ** log) });
 
-  const ticks = [10, 100, 1000]
-    .filter((value) => range.contains(value))
-    .map((value) => ({ value: Math.log10(value), label: `${value}` }));
+  const ticks = LOG_TIME_CONTROL.MAJOR_TICKS.filter((value) => range.contains(value)).map((value) => ({
+    value: Math.log10(value),
+    label: `${value}`,
+  }));
 
   const control = createNumberControl(logProperty, logRange, {
     titleProperty: config.titleProperty,
     valuePatternProperty: config.patternProperty,
     accessibleName: config.accessibleName,
     accessibleHelpText: config.accessibleHelpText,
-    decimalPlaces: 0,
-    delta: 0.01,
+    decimalPlaces: READOUT_PRECISION.TIME,
+    delta: LOG_TIME_CONTROL.DELTA,
     majorTicks: ticks,
     numberFormatter: format,
     numberFormatterDependencies: [config.patternProperty],

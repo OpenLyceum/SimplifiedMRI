@@ -10,6 +10,7 @@ import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
+import { READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 import type { MRIModel } from "../model/MRIModel.js";
 
 export class MRIScreenSummaryContent extends ScreenSummaryContent {
@@ -31,11 +32,11 @@ export class MRIScreenSummaryContent extends ScreenSummaryContent {
       ],
       (pattern, present, absent, field, horizontal, vertical, frequency, power, count, tumor) =>
         StringUtils.fillIn(pattern, {
-          field: toFixed(field, 2),
-          horizontal: toFixed(horizontal, 3),
-          vertical: toFixed(vertical, 3),
-          frequency: toFixed(frequency, 1),
-          power: toFixed(power, 0),
+          field: toFixed(field, READOUT_PRECISION.FIELD),
+          horizontal: toFixed(horizontal, READOUT_PRECISION.GRADIENT),
+          vertical: toFixed(vertical, READOUT_PRECISION.GRADIENT),
+          frequency: toFixed(frequency, READOUT_PRECISION.FREQUENCY),
+          power: toFixed(power, READOUT_PRECISION.POWER),
           count,
           tumor: tumor ? present : absent,
         }),

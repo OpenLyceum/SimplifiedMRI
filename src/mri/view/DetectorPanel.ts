@@ -14,11 +14,9 @@ import { SimplifiedMRIPanel } from "../../common/SimplifiedMRIPanel.js";
 import { createPanelTitle } from "../../common/view/controlHelpers.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, FONTS } from "../../SimplifiedMRIConstants.js";
+import { CONTROL_WIDTH, DETECTOR_PANEL, FONTS } from "../../SimplifiedMRIConstants.js";
 
 /** Rate (photons/s) that fills the bar. */
-const FULL_SCALE_RATE = 40;
-const BAR_HEIGHT = 10;
 
 export class DetectorPanel extends SimplifiedMRIPanel {
   public constructor(detector: Detector) {
@@ -27,25 +25,34 @@ export class DetectorPanel extends SimplifiedMRIPanel {
       new DerivedProperty([strings.detectorRatePatternStringProperty, detector.countProperty], (pattern, count) =>
         StringUtils.fillIn(pattern, { count }),
       ),
-      { font: FONTS.READOUT_VALUE, fill: SimplifiedMRIColors.textColorProperty, maxWidth: 110 },
+      {
+        font: FONTS.READOUT_VALUE,
+        fill: SimplifiedMRIColors.textColorProperty,
+        maxWidth: DETECTOR_PANEL.READOUT_WIDTH,
+      },
     );
-    const barWidth = CONTROL_WIDTH - 120;
-    const track = new Rectangle(0, 0, barWidth, BAR_HEIGHT, {
+    const barWidth = CONTROL_WIDTH - DETECTOR_PANEL.BAR_WIDTH_INSET;
+    const track = new Rectangle(0, 0, barWidth, DETECTOR_PANEL.BAR_HEIGHT, {
       fill: SimplifiedMRIColors.chamberFillColorProperty,
       stroke: SimplifiedMRIColors.panelBorderColorProperty,
     });
-    const bar = new Rectangle(0, 0, 0, BAR_HEIGHT, { fill: SimplifiedMRIColors.detectorGlowColorProperty });
+    const bar = new Rectangle(0, 0, 0, DETECTOR_PANEL.BAR_HEIGHT, {
+      fill: SimplifiedMRIColors.detectorGlowColorProperty,
+    });
     detector.countProperty.link((count) => {
-      bar.rectWidth = barWidth * Math.min(1, count / FULL_SCALE_RATE);
+      bar.rectWidth = barWidth * Math.min(1, count / DETECTOR_PANEL.FULL_SCALE_RATE);
     });
 
     super(
       new VBox({
-        spacing: 6,
+        spacing: DETECTOR_PANEL.PANEL_SPACING,
         align: "left",
         children: [
           createPanelTitle(strings.detectorStringProperty),
-          new HBox({ spacing: 10, children: [new Node({ children: [track, bar] }), rateText] }),
+          new HBox({
+            spacing: DETECTOR_PANEL.READOUT_SPACING,
+            children: [new Node({ children: [track, bar] }), rateText],
+          }),
         ],
       }),
     );

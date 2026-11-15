@@ -19,13 +19,8 @@ import { Line, Node, RichText, Text, VBox } from "scenerystack/scenery";
 import { ChartFrameNode } from "../../common/view/ChartFrameNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { FONTS, RELAXATION } from "../../SimplifiedMRIConstants.js";
+import { FONTS, RELAXATION, RELAXATION_CHART } from "../../SimplifiedMRIConstants.js";
 import type { RelaxationModel } from "../model/RelaxationModel.js";
-
-const CHART_WIDTH = 250;
-const CHART_HEIGHT = 120;
-const SIGNAL_SAMPLES_PER_CYCLE = 16;
-const Y_RANGE = new Range(-1.05, 1.05);
 
 export class RelaxationChartsNode extends VBox {
   private readonly model: RelaxationModel;
@@ -39,36 +34,36 @@ export class RelaxationChartsNode extends VBox {
     const strings = StringManager.getInstance().getRelaxationStrings();
 
     const longitudinal = new ChartFrameNode({
-      viewWidth: CHART_WIDTH,
-      viewHeight: CHART_HEIGHT,
+      viewWidth: RELAXATION_CHART.WIDTH,
+      viewHeight: RELAXATION_CHART.HEIGHT,
       xRange: new Range(0, model.longitudinalWindowProperty.value),
-      yRange: Y_RANGE,
+      yRange: RELAXATION_CHART.Y_RANGE,
       xAxisLabelProperty: strings.timeAxisStringProperty,
       yAxisLabelProperty: strings.mzAxisStringProperty,
-      targetDivisions: 4,
+      targetDivisions: RELAXATION_CHART.TARGET_DIVISIONS,
     });
     const transverse = new ChartFrameNode({
-      viewWidth: CHART_WIDTH,
-      viewHeight: CHART_HEIGHT,
+      viewWidth: RELAXATION_CHART.WIDTH,
+      viewHeight: RELAXATION_CHART.HEIGHT,
       xRange: new Range(0, model.transverseWindowProperty.value),
-      yRange: Y_RANGE,
+      yRange: RELAXATION_CHART.Y_RANGE,
       xAxisLabelProperty: strings.timeAxisStringProperty,
       yAxisLabelProperty: strings.mxyAxisStringProperty,
-      targetDivisions: 4,
+      targetDivisions: RELAXATION_CHART.TARGET_DIVISIONS,
     });
 
     const mzPlot = new LinePlot(longitudinal.chartTransform, [], {
       stroke: SimplifiedMRIColors.mzCurveColorProperty,
-      lineWidth: 2.5,
+      lineWidth: RELAXATION_CHART.CURVE_WIDTH,
     });
     const signalPlot = new LinePlot(transverse.chartTransform, [], {
       stroke: SimplifiedMRIColors.signalCurveColorProperty,
-      lineWidth: 1.2,
+      lineWidth: RELAXATION_CHART.SIGNAL_WIDTH,
       visibleProperty: model.signalVisibleProperty,
     });
     const mxyPlot = new LinePlot(transverse.chartTransform, [], {
       stroke: SimplifiedMRIColors.mxyCurveColorProperty,
-      lineWidth: 2.5,
+      lineWidth: RELAXATION_CHART.CURVE_WIDTH,
     });
     longitudinal.plotLayer.addChild(mzPlot);
     transverse.plotLayer.addChild(signalPlot);
@@ -77,14 +72,17 @@ export class RelaxationChartsNode extends VBox {
     // Zero lines, and T1 / T2 markers.
     const zeroLine = (frame: ChartFrameNode): Line => {
       const y = frame.chartTransform.modelToViewY(0);
-      return new Line(0, y, CHART_WIDTH, y, { stroke: SimplifiedMRIColors.chartAxisColorProperty, lineWidth: 0.8 });
+      return new Line(0, y, RELAXATION_CHART.WIDTH, y, {
+        stroke: SimplifiedMRIColors.chartAxisColorProperty,
+        lineWidth: RELAXATION_CHART.ZERO_LINE_WIDTH,
+      });
     };
     longitudinal.plotLayer.addChild(zeroLine(longitudinal));
     transverse.plotLayer.addChild(zeroLine(transverse));
     const marker = (frame: ChartFrameNode, label: string): { line: Line; text: RichText } => {
-      const line = new Line(0, 0, 0, CHART_HEIGHT, {
+      const line = new Line(0, 0, 0, RELAXATION_CHART.HEIGHT, {
         stroke: SimplifiedMRIColors.secondaryTextColorProperty,
-        lineDash: [4, 3],
+        lineDash: [...RELAXATION_CHART.MARKER_DASH],
       });
       const text = new RichText(label, { font: FONTS.SMALL, fill: SimplifiedMRIColors.secondaryTextColorProperty });
       frame.overlayLayer.children = [line, text];
@@ -94,16 +92,20 @@ export class RelaxationChartsNode extends VBox {
     const t2Marker = marker(transverse, "T<sub>2</sub>");
 
     const title = (property: typeof strings.longitudinalTitleStringProperty): Text =>
-      new Text(property, { font: FONTS.CONTROL_TITLE, fill: SimplifiedMRIColors.textColorProperty, maxWidth: 300 });
+      new Text(property, {
+        font: FONTS.CONTROL_TITLE,
+        fill: SimplifiedMRIColors.textColorProperty,
+        maxWidth: RELAXATION_CHART.MAX_TEXT_WIDTH,
+      });
     const signalNote = new Text(strings.signalNoteStringProperty, {
       font: FONTS.SMALL,
       fill: SimplifiedMRIColors.secondaryTextColorProperty,
-      maxWidth: 300,
+      maxWidth: RELAXATION_CHART.MAX_TEXT_WIDTH,
       visibleProperty: model.signalVisibleProperty,
     });
 
     super({
-      spacing: 6,
+      spacing: RELAXATION_CHART.SPACING,
       align: "left",
       children: [
         title(strings.longitudinalTitleStringProperty),
@@ -121,13 +123,13 @@ export class RelaxationChartsNode extends VBox {
     Multilink.multilink(
       [model.longitudinalWindowProperty, model.transverseWindowProperty, model.t1Property, model.t2Property],
       (longWindow, shortWindow, t1, t2) => {
-        longitudinal.setRanges(new Range(0, longWindow), Y_RANGE);
-        transverse.setRanges(new Range(0, shortWindow), Y_RANGE);
+        longitudinal.setRanges(new Range(0, longWindow), RELAXATION_CHART.Y_RANGE);
+        transverse.setRanges(new Range(0, shortWindow), RELAXATION_CHART.Y_RANGE);
         const place = (frame: ChartFrameNode, m: { line: Line; text: RichText }, t: number, window: number): void => {
           const x = frame.chartTransform.modelToViewX(Math.min(t, window));
-          m.line.setLine(x, 0, x, CHART_HEIGHT);
-          m.text.left = x + 3;
-          m.text.top = 2;
+          m.line.setLine(x, 0, x, RELAXATION_CHART.HEIGHT);
+          m.text.left = x + RELAXATION_CHART.MARKER_LABEL_X_GAP;
+          m.text.top = RELAXATION_CHART.MARKER_LABEL_TOP;
           m.line.visible = t <= window;
           m.text.visible = t <= window;
         };
@@ -164,7 +166,7 @@ export class RelaxationChartsNode extends VBox {
     const signal: Vector2[] = [];
     if (signalEnd >= 0) {
       const omega = (2 * Math.PI * RELAXATION.SIGNAL_CYCLES) / shortWindow;
-      const spacing = shortWindow / (RELAXATION.SIGNAL_CYCLES * SIGNAL_SAMPLES_PER_CYCLE);
+      const spacing = shortWindow / (RELAXATION.SIGNAL_CYCLES * RELAXATION_CHART.SIGNAL_SAMPLES_PER_CYCLE);
       const t2 = this.model.t2Property.value;
       const amplitude = this.model.pulseTransverse;
       const point = (t: number): Vector2 => new Vector2(t, amplitude * Math.exp(-t / t2) * Math.cos(omega * t));

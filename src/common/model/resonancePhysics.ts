@@ -7,13 +7,7 @@
  */
 
 import { clamp } from "scenerystack/dot";
-import { MAGNET, RESONANCE, SPIN } from "../../SimplifiedMRIConstants.js";
-
-/** Planck constant (J s). */
-const PLANCK = 6.62607015e-34;
-
-/** Boltzmann constant (J/K). */
-const BOLTZMANN = 1.380649e-23;
+import { MAGNET, PHYSICAL, RESONANCE, SPIN, UNITS } from "../../SimplifiedMRIConstants.js";
 
 /**
  * Resonance (Larmor) frequency f = γ|B|, with γ the gyromagnetic ratio over 2π.
@@ -70,8 +64,8 @@ export function targetAlignedFraction(field: number): number {
  * @param temperature - temperature (K)
  */
 export function thermalAlignedExcess(frequency: number, temperature: number): number {
-  const energy = PLANCK * frequency * 1e6;
-  return Math.tanh(energy / (2 * BOLTZMANN * temperature));
+  const energy = PHYSICAL.PLANCK * frequency * UNITS.HZ_PER_MHZ;
+  return Math.tanh(energy / (2 * PHYSICAL.BOLTZMANN * temperature));
 }
 
 /**

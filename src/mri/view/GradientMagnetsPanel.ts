@@ -10,22 +10,22 @@ import type { ResonanceModel } from "../../common/model/ResonanceModel.js";
 import { SimplifiedMRIPanel } from "../../common/SimplifiedMRIPanel.js";
 import { createNumberControl, createPanelTitle } from "../../common/view/controlHelpers.js";
 import { StringManager } from "../../i18n/StringManager.js";
-import { MAGNET } from "../../SimplifiedMRIConstants.js";
+import { GRADIENT_CONTROLS, MAGNET, READOUT_PRECISION } from "../../SimplifiedMRIConstants.js";
 
 export class GradientMagnetsPanel extends SimplifiedMRIPanel {
   public constructor(model: ResonanceModel) {
     const common = StringManager.getInstance().getCommonStrings();
     const strings = StringManager.getInstance().getMRIStrings();
     const a11y = StringManager.getInstance().getMRIA11yStrings();
-    const ticks = [0, 0.1, 0.2].map((value) => ({ value, label: `${value}` }));
+    const ticks = GRADIENT_CONTROLS.MAJOR_TICKS.map((value) => ({ value, label: `${value}` }));
 
     const horizontal = createNumberControl(model.horizontalGradientProperty, MAGNET.GRADIENT_RANGE, {
       titleProperty: strings.horizontalStringProperty,
       valuePatternProperty: common.teslaPatternStringProperty,
       accessibleName: a11y.horizontalGradientStringProperty,
       accessibleHelpText: a11y.gradientHelpStringProperty,
-      decimalPlaces: 3,
-      delta: 0.005,
+      decimalPlaces: READOUT_PRECISION.GRADIENT,
+      delta: GRADIENT_CONTROLS.DELTA,
       majorTicks: ticks,
     });
     const vertical = createNumberControl(model.verticalGradientProperty, MAGNET.GRADIENT_RANGE, {
@@ -33,14 +33,14 @@ export class GradientMagnetsPanel extends SimplifiedMRIPanel {
       valuePatternProperty: common.teslaPatternStringProperty,
       accessibleName: a11y.verticalGradientStringProperty,
       accessibleHelpText: a11y.gradientHelpStringProperty,
-      decimalPlaces: 3,
-      delta: 0.005,
+      decimalPlaces: READOUT_PRECISION.GRADIENT,
+      delta: GRADIENT_CONTROLS.DELTA,
       majorTicks: ticks,
     });
 
     super(
       new VBox({
-        spacing: 8,
+        spacing: GRADIENT_CONTROLS.SPACING,
         align: "left",
         children: [createPanelTitle(strings.gradientMagnetsStringProperty), horizontal, vertical],
       }),

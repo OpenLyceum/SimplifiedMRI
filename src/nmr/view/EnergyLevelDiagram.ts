@@ -19,15 +19,8 @@ import { NucleusGlyph } from "../../common/view/NucleusGlyph.js";
 import { nucleusColor } from "../../common/view/nucleusColors.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { CONTROL_WIDTH, FONTS, MAGNET, RADIO, RESONANCE } from "../../SimplifiedMRIConstants.js";
+import { CONTROL_WIDTH, ENERGY_DIAGRAM, FONTS, MAGNET, RADIO, RESONANCE } from "../../SimplifiedMRIConstants.js";
 import type { NMRModel } from "../model/NMRModel.js";
-
-const HEIGHT = 170;
-const AXIS_X = 10;
-const SQUIGGLE_X = 42;
-const LEVEL_LEFT = 62;
-const LEVEL_WIDTH = CONTROL_WIDTH - LEVEL_LEFT;
-const ICON_RADIUS = 6;
 
 /** Frequency (MHz) drawn as the full height. */
 const FULL_SCALE = NucleusType.HYDROGEN_1.gyromagneticRatio * MAGNET.MAIN_FIELD_RANGE.max;
@@ -36,12 +29,13 @@ export class EnergyLevelDiagram extends VBox {
   public constructor(model: NMRModel) {
     const strings = StringManager.getInstance().getCommonStrings();
     const diagram = new Node();
+    const levelWidth = CONTROL_WIDTH - ENERGY_DIAGRAM.LEVEL_LEFT;
 
     // Energy axis.
-    const axis = new ArrowNode(AXIS_X, HEIGHT, AXIS_X, 0, {
-      headHeight: 8,
-      headWidth: 8,
-      tailWidth: 1.5,
+    const axis = new ArrowNode(ENERGY_DIAGRAM.AXIS_X, ENERGY_DIAGRAM.HEIGHT, ENERGY_DIAGRAM.AXIS_X, 0, {
+      headHeight: ENERGY_DIAGRAM.AXIS_HEAD_SIZE,
+      headWidth: ENERGY_DIAGRAM.AXIS_HEAD_SIZE,
+      tailWidth: ENERGY_DIAGRAM.AXIS_TAIL_WIDTH,
       fill: SimplifiedMRIColors.textColorProperty,
       stroke: null,
     });
@@ -49,20 +43,27 @@ export class EnergyLevelDiagram extends VBox {
       font: FONTS.SMALL,
       fill: SimplifiedMRIColors.textColorProperty,
       rotation: -Math.PI / 2,
-      maxWidth: HEIGHT * 0.6,
+      maxWidth: ENERGY_DIAGRAM.HEIGHT * ENERGY_DIAGRAM.AXIS_LABEL_HEIGHT_FACTOR,
     });
     axisLabel.boundsProperty.link(() => {
-      axisLabel.right = AXIS_X - 4;
-      axisLabel.centerY = HEIGHT / 2;
+      axisLabel.right = ENERGY_DIAGRAM.AXIS_X - ENERGY_DIAGRAM.LABEL_GAP;
+      axisLabel.centerY = ENERGY_DIAGRAM.HEIGHT / 2;
     });
 
-    const lowerLine = new Line(LEVEL_LEFT, 0, LEVEL_LEFT + LEVEL_WIDTH, 0, { lineWidth: 2 });
-    const upperLine = new Line(LEVEL_LEFT, 0, LEVEL_LEFT + LEVEL_WIDTH, 0, { lineWidth: 2 });
-    const squiggle = new Path(null, { stroke: SimplifiedMRIColors.radioWaveColorProperty, lineWidth: 2 });
+    const lowerLine = new Line(ENERGY_DIAGRAM.LEVEL_LEFT, 0, CONTROL_WIDTH, 0, {
+      lineWidth: ENERGY_DIAGRAM.LINE_WIDTH,
+    });
+    const upperLine = new Line(ENERGY_DIAGRAM.LEVEL_LEFT, 0, CONTROL_WIDTH, 0, {
+      lineWidth: ENERGY_DIAGRAM.LINE_WIDTH,
+    });
+    const squiggle = new Path(null, {
+      stroke: SimplifiedMRIColors.radioWaveColorProperty,
+      lineWidth: ENERGY_DIAGRAM.LINE_WIDTH,
+    });
     const resonanceText = new Text(strings.onResonanceStringProperty, {
       font: FONTS.READOUT_VALUE,
       fill: SimplifiedMRIColors.energyLevelResonantColorProperty,
-      maxWidth: LEVEL_WIDTH,
+      maxWidth: levelWidth,
     });
 
     // One icon per nucleus on each level; only the right number are shown.
@@ -71,14 +72,19 @@ export class EnergyLevelDiagram extends VBox {
     const upperIcons: NucleusGlyph[] = [];
     const iconLayer = new Node();
     for (let i = 0; i < count; i++) {
-      const lower = new NucleusGlyph(ICON_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty);
-      const upper = new NucleusGlyph(ICON_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty, { rotation: Math.PI });
+      const lower = new NucleusGlyph(ENERGY_DIAGRAM.ICON_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty);
+      const upper = new NucleusGlyph(ENERGY_DIAGRAM.ICON_RADIUS, SimplifiedMRIColors.hydrogen1ColorProperty, {
+        rotation: Math.PI,
+      });
       lowerIcons.push(lower);
       upperIcons.push(upper);
       iconLayer.addChild(lower);
       iconLayer.addChild(upper);
     }
-    const iconSpacing = Math.min(2 * ICON_RADIUS + 1, (LEVEL_WIDTH - 2 * ICON_RADIUS) / Math.max(1, count - 1));
+    const iconSpacing = Math.min(
+      2 * ENERGY_DIAGRAM.ICON_RADIUS + 1,
+      (levelWidth - 2 * ENERGY_DIAGRAM.ICON_RADIUS) / Math.max(1, count - 1),
+    );
 
     diagram.children = [axis, axisLabel, lowerLine, upperLine, squiggle, iconLayer, resonanceText];
 
@@ -92,31 +98,37 @@ export class EnergyLevelDiagram extends VBox {
         model.nucleusTypeProperty,
       ],
       (resonance, frequency, power, aligned, strength, type) => {
-        const gap = (HEIGHT - 30) * (resonance / FULL_SCALE);
-        const lowerY = HEIGHT - 12;
+        const gap = (ENERGY_DIAGRAM.HEIGHT - ENERGY_DIAGRAM.LEVEL_HEIGHT_INSET) * (resonance / FULL_SCALE);
+        const lowerY = ENERGY_DIAGRAM.HEIGHT - ENERGY_DIAGRAM.LOWER_LEVEL_INSET;
         const upperY = lowerY - gap;
         const onResonance = strength >= RESONANCE.INDICATOR_THRESHOLD && power > 0;
         const levelColor = onResonance
           ? SimplifiedMRIColors.energyLevelResonantColorProperty
           : SimplifiedMRIColors.energyLevelColorProperty;
-        lowerLine.setLine(LEVEL_LEFT, lowerY, LEVEL_LEFT + LEVEL_WIDTH, lowerY);
-        upperLine.setLine(LEVEL_LEFT, upperY, LEVEL_LEFT + LEVEL_WIDTH, upperY);
+        lowerLine.setLine(ENERGY_DIAGRAM.LEVEL_LEFT, lowerY, CONTROL_WIDTH, lowerY);
+        upperLine.setLine(ENERGY_DIAGRAM.LEVEL_LEFT, upperY, CONTROL_WIDTH, upperY);
         lowerLine.stroke = levelColor;
         upperLine.stroke = levelColor;
-        lowerLine.lineWidth = onResonance ? 3 : 2;
-        upperLine.lineWidth = onResonance ? 3 : 2;
+        lowerLine.lineWidth = onResonance ? ENERGY_DIAGRAM.RESONANT_LINE_WIDTH : ENERGY_DIAGRAM.LINE_WIDTH;
+        upperLine.lineWidth = onResonance ? ENERGY_DIAGRAM.RESONANT_LINE_WIDTH : ENERGY_DIAGRAM.LINE_WIDTH;
         resonanceText.visible = onResonance;
-        resonanceText.right = LEVEL_LEFT + LEVEL_WIDTH;
-        resonanceText.bottom = Math.max(14, upperY - 2 * ICON_RADIUS - 4);
+        resonanceText.right = CONTROL_WIDTH;
+        resonanceText.bottom = Math.max(
+          ENERGY_DIAGRAM.MIN_READOUT_Y,
+          upperY - 2 * ENERGY_DIAGRAM.ICON_RADIUS - ENERGY_DIAGRAM.LABEL_GAP,
+        );
 
         // Squiggle from the lower level up by the photon energy; more wiggles at higher f.
-        const height = (HEIGHT - 30) * (frequency / FULL_SCALE);
-        const cycles = Math.max(1, Math.round((frequency / RADIO.FREQUENCY_RANGE.max) * 9));
+        const height = (ENERGY_DIAGRAM.HEIGHT - ENERGY_DIAGRAM.LEVEL_HEIGHT_INSET) * (frequency / FULL_SCALE);
+        const cycles = Math.max(
+          1,
+          Math.round((frequency / RADIO.FREQUENCY_RANGE.max) * ENERGY_DIAGRAM.MAX_WAVE_CYCLES),
+        );
         const shape = new Shape();
-        const segments = 60;
+        const segments = ENERGY_DIAGRAM.WAVE_SEGMENTS;
         for (let i = 0; i <= segments; i++) {
           const s = i / segments;
-          const x = SQUIGGLE_X + 5 * Math.sin(2 * Math.PI * cycles * s);
+          const x = ENERGY_DIAGRAM.SQUIGGLE_X + ENERGY_DIAGRAM.WAVE_AMPLITUDE * Math.sin(2 * Math.PI * cycles * s);
           const y = lowerY - s * height;
           if (i === 0) {
             shape.moveTo(x, y);
@@ -125,7 +137,7 @@ export class EnergyLevelDiagram extends VBox {
           }
         }
         squiggle.shape = shape;
-        squiggle.opacity = power > 0 ? 1 : 0.35;
+        squiggle.opacity = power > 0 ? 1 : ENERGY_DIAGRAM.INACTIVE_OPACITY;
 
         const fill = nucleusColor(type);
         for (let i = 0; i < count; i++) {
@@ -134,17 +146,27 @@ export class EnergyLevelDiagram extends VBox {
           if (!(lower && upper)) {
             continue;
           }
-          const x = LEVEL_LEFT + ICON_RADIUS + i * iconSpacing;
+          const x = ENERGY_DIAGRAM.LEVEL_LEFT + ENERGY_DIAGRAM.ICON_RADIUS + i * iconSpacing;
           lower.visible = i < aligned;
           upper.visible = i < count - aligned;
           lower.setBodyFill(fill);
           upper.setBodyFill(fill);
-          lower.translation = lower.translation.setXY(x, lowerY - ICON_RADIUS * 1.1);
-          upper.translation = upper.translation.setXY(x, upperY - ICON_RADIUS * 1.1);
+          lower.translation = lower.translation.setXY(
+            x,
+            lowerY - ENERGY_DIAGRAM.ICON_RADIUS * ENERGY_DIAGRAM.ICON_Y_FACTOR,
+          );
+          upper.translation = upper.translation.setXY(
+            x,
+            upperY - ENERGY_DIAGRAM.ICON_RADIUS * ENERGY_DIAGRAM.ICON_Y_FACTOR,
+          );
         }
       },
     );
 
-    super({ spacing: 6, align: "left", children: [createPanelTitle(strings.energyLevelsStringProperty), diagram] });
+    super({
+      spacing: ENERGY_DIAGRAM.PANEL_SPACING,
+      align: "left",
+      children: [createPanelTitle(strings.energyLevelsStringProperty), diagram],
+    });
   }
 }

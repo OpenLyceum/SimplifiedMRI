@@ -17,7 +17,7 @@ import { Range } from "scenerystack/dot";
 import { Orientation } from "scenerystack/phet-core";
 import { Node, type NodeOptions, RichText, Text } from "scenerystack/scenery";
 import SimplifiedMRIColors from "../../SimplifiedMRIColors.js";
-import { FONTS } from "../../SimplifiedMRIConstants.js";
+import { CHART_FRAME, FONTS } from "../../SimplifiedMRIConstants.js";
 import { decimalPlacesForStep, formatTickValue, niceStep } from "./chartUtils.js";
 
 export type ChartFrameNodeOptions = {
@@ -53,7 +53,7 @@ export class ChartFrameNode extends Node {
 
   public constructor(options: ChartFrameNodeOptions) {
     super();
-    this.targetDivisions = options.targetDivisions ?? 5;
+    this.targetDivisions = options.targetDivisions ?? CHART_FRAME.TARGET_DIVISIONS;
 
     this.chartTransform = new ChartTransform({
       viewWidth: options.viewWidth,
@@ -66,14 +66,18 @@ export class ChartFrameNode extends Node {
     const background = new ChartRectangle(transform, {
       fill: SimplifiedMRIColors.chartBackgroundColorProperty,
       stroke: SimplifiedMRIColors.chartAxisColorProperty,
-      lineWidth: 1,
+      lineWidth: CHART_FRAME.LINE_WIDTH,
     });
 
     const gridOptions = { stroke: SimplifiedMRIColors.chartGridColorProperty };
     this.gridX = new GridLineSet(transform, Orientation.HORIZONTAL, 1, gridOptions);
     this.gridY = new GridLineSet(transform, Orientation.VERTICAL, 1, gridOptions);
 
-    const tickOptions = { edge: "min" as const, stroke: SimplifiedMRIColors.chartAxisColorProperty, extent: 5 };
+    const tickOptions = {
+      edge: "min" as const,
+      stroke: SimplifiedMRIColors.chartAxisColorProperty,
+      extent: CHART_FRAME.TICK_EXTENT,
+    };
     this.ticksX = new TickMarkSet(transform, Orientation.HORIZONTAL, 1, tickOptions);
     this.ticksY = new TickMarkSet(transform, Orientation.VERTICAL, 1, tickOptions);
 
@@ -84,12 +88,12 @@ export class ChartFrameNode extends Node {
       });
     this.labelsX = new TickLabelSet(transform, Orientation.HORIZONTAL, 1, {
       edge: "min",
-      extent: 6,
+      extent: CHART_FRAME.LABEL_EXTENT,
       createLabel: (value: number) => makeLabel(value, this.xDecimals),
     });
     this.labelsY = new TickLabelSet(transform, Orientation.VERTICAL, 1, {
       edge: "min",
-      extent: 6,
+      extent: CHART_FRAME.LABEL_EXTENT,
       createLabel: (value: number) => makeLabel(value, this.yDecimals),
     });
 
@@ -109,9 +113,9 @@ export class ChartFrameNode extends Node {
     });
     const placeAxisLabels = (): void => {
       xAxisLabel.centerX = options.viewWidth / 2;
-      xAxisLabel.top = options.viewHeight + 20;
+      xAxisLabel.top = options.viewHeight + CHART_FRAME.X_LABEL_GAP;
       yAxisLabel.centerY = options.viewHeight / 2;
-      yAxisLabel.right = -32;
+      yAxisLabel.right = -CHART_FRAME.Y_LABEL_GAP;
     };
     xAxisLabel.boundsProperty.lazyLink(placeAxisLabels);
     yAxisLabel.boundsProperty.lazyLink(placeAxisLabels);

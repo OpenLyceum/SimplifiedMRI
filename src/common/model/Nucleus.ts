@@ -94,7 +94,7 @@ export class Nucleus {
     const h = dt / substeps;
     for (let i = 0; i < substeps; i++) {
       const phi = Math.atan2(Math.sin(target - this.orientation), Math.cos(target - this.orientation));
-      if (Math.abs(phi) < 0.01 && Math.abs(this.angularVelocity) < 0.5) {
+      if (Math.abs(phi) < NUCLEUS.ANGLE_TOLERANCE && Math.abs(this.angularVelocity) < NUCLEUS.ANGULAR_SPEED_TOLERANCE) {
         this.orientation = target;
         this.angularVelocity = 0;
         break;
