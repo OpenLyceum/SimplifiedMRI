@@ -56,7 +56,7 @@ export type ResonanceModelOptions = {
 
 export class ResonanceModel implements TModel {
   public readonly random: Random;
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel({ initiallyPlaying: true });
 
   // ── Controls ────────────────────────────────────────────────────────────────
   public readonly nucleusTypeProperty = new EnumerationProperty(NucleusType.HYDROGEN_1);

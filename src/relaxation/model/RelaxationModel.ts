@@ -42,7 +42,7 @@ export type RelaxationSample = { readonly t: number; readonly mz: number; readon
 const DEFAULT_TISSUE = Tissue.WHITE_MATTER;
 
 export class RelaxationModel implements TModel {
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel({ initiallyPlaying: true });
   public readonly timeSpeedProperty = new EnumerationProperty(TimeSpeed.NORMAL);
 
   // ── Controls ────────────────────────────────────────────────────────────────
