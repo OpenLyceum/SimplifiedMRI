@@ -39,8 +39,8 @@ export class NucleiLayer extends Node {
     const removeGlyph = (nucleus: Nucleus): void => {
       const glyph = this.glyphs.get(nucleus);
       if (glyph) {
-        this.removeChild(glyph);
-        glyph.dispose();
+        // disposeSubtree(): Node.dispose() would leave the glyph's four Paths undisposed.
+        glyph.disposeSubtree();
         this.glyphs.delete(nucleus);
       }
     };

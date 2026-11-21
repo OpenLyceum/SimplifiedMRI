@@ -163,6 +163,19 @@ export class RadioWavesNode extends Node {
     }
   }
 
+  /**
+   * Releases the photon pools. They only grow to the peak photon count, but without this
+   * a run at high power kept that peak's Paths for the rest of the session.
+   */
+  public reset(): void {
+    for (const pool of [this.incomingPool, this.emittedPool]) {
+      for (const path of pool) {
+        path.dispose();
+      }
+      pool.length = 0;
+    }
+  }
+
   /** Returns pool entry `index`, creating it if needed, made visible. */
   private poolPath(pool: Path[], layer: Node, index: number, isEmitted: boolean): Path {
     let path = pool[index];

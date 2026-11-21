@@ -183,7 +183,8 @@ export abstract class ResonanceScreenView extends ScreenView {
 
   /** Resets view-only state. */
   public reset(): void {
-    // All view state lives in the model.
+    // The model state lives in the model; the photon pools are the only view state.
+    this.radioWavesNode.reset();
   }
 
   public override step(dt: number): void {
