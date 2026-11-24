@@ -6,7 +6,7 @@
  * excess the sim exaggerates. No state, so every function is unit-tested directly.
  */
 
-import { clamp } from "scenerystack/dot";
+import { clamp, roundSymmetric } from "scenerystack/dot";
 import { MAGNET, PHYSICAL, RESONANCE, SPIN, UNITS } from "../../SimplifiedMRIConstants.js";
 
 /**
@@ -75,5 +75,5 @@ export function thermalAlignedExcess(frequency: number, temperature: number): nu
  * to the nearest whole nucleus.
  */
 export function targetAlignedCount(nucleusCount: number, field: number): number {
-  return Math.round(targetAlignedFraction(field) * nucleusCount);
+  return roundSymmetric(targetAlignedFraction(field) * nucleusCount);
 }

@@ -51,11 +51,11 @@ export class MRIScreenView extends ResonanceScreenView {
     this.underNucleiLayer.addChild(new HeadNode(t, model.headVisibleProperty, model.tumorPresentProperty));
     this.nucleiLayer.visibleProperty = model.nucleiVisibleProperty;
 
-    const horizontalStrength = new DerivedProperty(
+    const horizontalStrengthProperty = new DerivedProperty(
       [model.horizontalGradientProperty],
       (gradient) => gradient / MAGNET.GRADIENT_RANGE.max,
     );
-    const verticalStrength = new DerivedProperty(
+    const verticalStrengthProperty = new DerivedProperty(
       [model.verticalGradientProperty],
       (gradient) => gradient / MAGNET.GRADIENT_RANGE.max,
     );
@@ -63,7 +63,7 @@ export class MRIScreenView extends ResonanceScreenView {
       chamber.width,
       RESONANCE_LAYOUT.GRADIENT_COIL_THICKNESS,
       "horizontal",
-      horizontalStrength,
+      horizontalStrengthProperty,
       {
         segments: MRI_LAYOUT.HORIZONTAL_COIL_SEGMENTS,
         loops: MRI_LAYOUT.COIL_LOOPS,
@@ -75,7 +75,7 @@ export class MRIScreenView extends ResonanceScreenView {
       chamber.height,
       RESONANCE_LAYOUT.GRADIENT_COIL_THICKNESS,
       "vertical",
-      verticalStrength,
+      verticalStrengthProperty,
       {
         segments: MRI_LAYOUT.VERTICAL_COIL_SEGMENTS,
         loops: MRI_LAYOUT.COIL_LOOPS,
@@ -102,12 +102,12 @@ export class MRIScreenView extends ResonanceScreenView {
     const magnetPanel = new MainMagnetPanel(model, snapToResonanceProperty);
     const gradientPanel = new GradientMagnetsPanel(model);
 
-    const tumorButtonLabel = new DerivedProperty(
+    const tumorButtonLabelProperty = new DerivedProperty(
       [model.tumorPresentProperty, strings.addTumorStringProperty, strings.removeTumorStringProperty],
       (present, add, remove) => (present ? remove : add),
     );
-    const tumorButton = createPushButton(tumorButtonLabel, {
-      accessibleName: tumorButtonLabel,
+    const tumorButton = createPushButton(tumorButtonLabelProperty, {
+      accessibleName: tumorButtonLabelProperty,
       accessibleHelpText: a11y.tumorButtonHelpStringProperty,
       listener: () => {
         model.tumorPresentProperty.toggle();

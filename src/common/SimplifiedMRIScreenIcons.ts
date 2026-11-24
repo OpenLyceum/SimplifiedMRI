@@ -82,13 +82,13 @@ export function createNMRIcon(): ScreenIcon {
 }
 
 export function createMRIIcon(): ScreenIcon {
-  const full = new NumberProperty(MRI_ICON.STRENGTH);
-  const upper = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", full, {
+  const fullProperty = new NumberProperty(MRI_ICON.STRENGTH);
+  const upper = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", fullProperty, {
     loops: MRI_ICON.COIL_LOOPS,
     left: MRI_ICON.COIL_LEFT,
     top: MRI_ICON.COIL_MARGIN,
   });
-  const lower = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", full, {
+  const lower = new CoilNode(MRI_ICON.COIL_WIDTH, MRI_ICON.COIL_THICKNESS, "horizontal", fullProperty, {
     loops: MRI_ICON.COIL_LOOPS,
     left: MRI_ICON.COIL_LEFT,
     bottom: SCREEN_ICONS.HEIGHT - MRI_ICON.COIL_MARGIN,
