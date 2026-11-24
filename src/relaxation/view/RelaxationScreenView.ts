@@ -135,7 +135,7 @@ export class RelaxationScreenView extends ScreenView {
     // ── Tissue panel ────────────────────────────────────────────────────────────
     const listParent = new Node();
     const tissueItems = Tissue.enumeration.values.map((tissue) => {
-      const name = strings.tissues[`${tissue.key}StringProperty` as keyof typeof strings.tissues];
+      const name = strings.tissues[`${tissue.key}StringProperty`];
       return {
         value: tissue,
         createNode: () =>

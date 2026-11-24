@@ -11,7 +11,10 @@
  */
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
+import type stringsEn from "../../i18n/strings_en.json";
 import { TISSUE_TIMES } from "../../SimplifiedMRIConstants.js";
+
+type TissueKey = keyof (typeof stringsEn)["relaxation"]["tissues"];
 
 export class Tissue extends EnumerationValue {
   public static readonly FAT = new Tissue("fat", TISSUE_TIMES.FAT_T1, TISSUE_TIMES.FAT_T2);
@@ -33,7 +36,7 @@ export class Tissue extends EnumerationValue {
   public static readonly enumeration = new Enumeration(Tissue);
 
   /** Key of the tissue's name. */
-  public readonly key: string;
+  public readonly key: TissueKey;
 
   /** Longitudinal relaxation time (ms), or null for CUSTOM. */
   public readonly t1: number | null;
@@ -41,7 +44,7 @@ export class Tissue extends EnumerationValue {
   /** Transverse relaxation time (ms), or null for CUSTOM. */
   public readonly t2: number | null;
 
-  public constructor(key: string, t1: number | null, t2: number | null) {
+  public constructor(key: TissueKey, t1: number | null, t2: number | null) {
     super();
     this.key = key;
     this.t1 = t1;

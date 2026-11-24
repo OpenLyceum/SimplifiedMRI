@@ -50,12 +50,12 @@ export class NMRScreenView extends ResonanceScreenView {
     const nucleusItems = NucleusType.enumeration.values.map((type) => ({
       value: type,
       createNode: () =>
-        new Text(strings.nuclei[`${type.key}StringProperty` as keyof typeof strings.nuclei], {
+        new Text(strings.nuclei[`${type.key}StringProperty`], {
           font: FONTS.CONTROL_LABEL,
           fill: SimplifiedMRIColors.controlSurfaceTextColorProperty,
           maxWidth: CONTROL_WIDTH - NMR_LAYOUT.COMBO_TEXT_INSET,
         }),
-      accessibleName: strings.nuclei[`${type.key}StringProperty` as keyof typeof strings.nuclei],
+      accessibleName: strings.nuclei[`${type.key}StringProperty`],
     }));
     const nucleusComboBox = new ComboBox(model.nucleusTypeProperty, nucleusItems, listParent, {
       ...SIMPLIFIED_MRI_COMBO_BOX_OPTIONS,

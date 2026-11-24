@@ -10,7 +10,10 @@
  */
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
+import type stringsEn from "../../i18n/strings_en.json";
 import { GYROMAGNETIC_RATIOS } from "../../SimplifiedMRIConstants.js";
+
+type NucleusKey = keyof (typeof stringsEn)["common"]["nuclei"];
 
 export class NucleusType extends EnumerationValue {
   public static readonly HYDROGEN_1 = new NucleusType(GYROMAGNETIC_RATIOS.HYDROGEN_1, "hydrogen1");
@@ -27,9 +30,9 @@ export class NucleusType extends EnumerationValue {
   public readonly gyromagneticRatio: number;
 
   /** Key of the nucleus's name and colour. */
-  public readonly key: string;
+  public readonly key: NucleusKey;
 
-  public constructor(gyromagneticRatio: number, key: string) {
+  public constructor(gyromagneticRatio: number, key: NucleusKey) {
     super();
     this.gyromagneticRatio = gyromagneticRatio;
     this.key = key;
