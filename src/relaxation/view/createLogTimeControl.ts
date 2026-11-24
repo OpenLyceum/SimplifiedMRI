@@ -10,7 +10,7 @@
  */
 
 import { NumberProperty, type PhetioProperty, type TReadOnlyProperty } from "scenerystack/axon";
-import { Range } from "scenerystack/dot";
+import { Range, roundSymmetric } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import type { NumberControl } from "scenerystack/scenery-phet";
 import { createNumberControl } from "../../common/view/controlHelpers.js";
@@ -40,13 +40,13 @@ export function createLogTimeControl(
   logProperty.lazyLink((log) => {
     if (!syncing) {
       syncing = true;
-      timeProperty.value = range.constrainValue(Math.round(10 ** log));
+      timeProperty.value = range.constrainValue(roundSymmetric(10 ** log));
       syncing = false;
     }
   });
 
   const format = (log: number): string =>
-    StringUtils.fillIn(config.patternProperty.value, { value: Math.round(10 ** log) });
+    StringUtils.fillIn(config.patternProperty.value, { value: roundSymmetric(10 ** log) });
 
   const ticks = LOG_TIME_CONTROL.MAJOR_TICKS.filter((value) => range.contains(value)).map((value) => ({
     value: Math.log10(value),

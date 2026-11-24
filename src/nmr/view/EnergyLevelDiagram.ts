@@ -10,6 +10,7 @@
  */
 
 import { Multilink } from "scenerystack/axon";
+import { roundSymmetric } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Line, Node, Path, Text, VBox } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
@@ -122,7 +123,7 @@ export class EnergyLevelDiagram extends VBox {
         const height = (ENERGY_DIAGRAM.HEIGHT - ENERGY_DIAGRAM.LEVEL_HEIGHT_INSET) * (frequency / FULL_SCALE);
         const cycles = Math.max(
           1,
-          Math.round((frequency / RADIO.FREQUENCY_RANGE.max) * ENERGY_DIAGRAM.MAX_WAVE_CYCLES),
+          roundSymmetric((frequency / RADIO.FREQUENCY_RANGE.max) * ENERGY_DIAGRAM.MAX_WAVE_CYCLES),
         );
         const shape = new Shape();
         const segments = ENERGY_DIAGRAM.WAVE_SEGMENTS;
